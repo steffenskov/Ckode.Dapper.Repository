@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace Ckode.Dapper.Repository
 {
@@ -7,38 +8,53 @@ namespace Ckode.Dapper.Repository
 		where TRecord : BaseTableRecord
 	{
 		private readonly SQLGenerator generator;
+
 		public DapperSQLRepository()
 		{
 			generator = new SQLGenerator();
 		}
 
-		protected abstract string TableName { get; }
+		protected abstract IDbConnection CreateConnection();
 
-		public bool Delete(TRecord record)
+		// TODO: Make abstract methods for injecting dapper functionality
+
+		public TRecord Delete(TRecord record)
 		{
 			var query = generator.GenerateDeleteQuery(record);
-			// Invoke dapper query on connection
-			return true;
+			using (var connection = CreateConnection())
+			{
+				// TODO: Execute query
+			}
+			return record;
 		}
 
 		public TRecord Get(TRecord record)
 		{
-			throw new NotImplementedException();
+			var query = generator.GenerateGetQuery(record);
+			// Invoke dapper query on connection
+			return record;
 		}
 
 		public IEnumerable<TRecord> GetAll()
 		{
+			// TODO: How do I get table name here?
+			// Depend on service locator maybe? not the prettiest solution....
+
 			throw new NotImplementedException();
 		}
 
-		public bool Insert(TRecord entry)
+		public TRecord Insert(TRecord record)
 		{
-			throw new NotImplementedException();
+			var query = generator.GenerateInsertQuery(record);
+			// Invoke dapper query on connection
+			return record;
 		}
 
-		public bool Update(TRecord entry)
+		public TRecord Update(TRecord record)
 		{
-			throw new NotImplementedException();
+			var query = generator.GenerateUpdateQuery(record);
+			// Invoke dapper query on connection
+			return record;
 		}
 	}
 }

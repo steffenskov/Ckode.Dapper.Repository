@@ -2,67 +2,118 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Ckode.Dapper.Repository.MetaInformation;
-using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
 [assembly: InternalsVisibleTo("Ckode.Dapper.Repository.Tests")]
 namespace Ckode.Dapper.Repository
 {
 	internal class SQLGenerator
 	{
-		public string GenerateDeleteQuery<TRecord>(TRecord entity)
+		public string GenerateDeleteQuery<TRecord>(TRecord record)
 			where TRecord : BaseTableRecord
 		{
-			if (entity == null)
+			if (record == null)
 			{
-				throw new ArgumentNullException(nameof(entity));
+				throw new ArgumentNullException(nameof(record));
 			}
 
-			var info = RecordInformationCache.GetRecordInformation(entity);
+			var info = RecordInformationCache.GetRecordInformation(record);
 			string whereClause;
 			if (info.PrimaryKeys.Count == 0)
 			{
-				whereClause = GenerateDeleteWhereClauseWithoutPrimaryKey(entity, info);
+				whereClause = GenerateWhereClauseWithoutPrimaryKey(info);
 			}
 			else
 			{
-				whereClause = GenerateDeleteWhereClauseWithPrimaryKeys(entity, info);
+				whereClause = GenerateWhereClauseWithPrimaryKeys(info);
 			}
-		
-			return $"DELETE FROM {entity.TableName} OUTPUT deleted.* WHERE {whereClause}";
+
+			return $"DELETE FROM {record.TableName} OUTPUT deleted.* WHERE {whereClause}";
 		}
 
-		private string GenerateDeleteWhereClauseWithoutPrimaryKey<TRecord>(TRecord entity, RecordInformation info) where TRecord : BaseTableRecord
-		{
-			var allColumns = info.ForeignKeys.Cast<IPropertyInfo>()
-									.Concat(info.OtherColumns); // No need to concat primary key, as this method is only called where there are none
-
-			return string.Join(" AND ", allColumns.Select(column => $"{column.Name} = @{column.Name}"));
-		}
-
-		private string GenerateDeleteWhereClauseWithPrimaryKeys<TRecord>(TRecord entity, RecordInformation info) where TRecord : BaseTableRecord
-		{
-			return string.Join(" AND ", info.PrimaryKeys.Select(key => $"{key.Name} = @{key.Name}"));
-		}
-
-		public string GenerateInsertQuery<TRecord>(TRecord entity)
+		public string GenerateInsertQuery<TRecord>(TRecord record)
 			where TRecord : BaseTableRecord
 		{
-			if (entity == null)
+			if (record == null)
 			{
-				throw new ArgumentNullException(nameof(entity));
+				throw new ArgumentNullException(nameof(record));
 			}
 
-			var info = RecordInformationCache.GetRecordInformation(entity);
-			var columnsToIgnore = info.PrimaryKeys.Where(pk => pk.HasDefaultValue(entity)).ToList(); // Assume these primary keys are identify columns
+			var info = RecordInformationCache.GetRecordInformation(record);
+			var idrecordColumns = info.PrimaryKeys.Where(pk => pk.IsIdrecord).Select(pk => pk.Property).ToList();
 
-			var columnsToInsert = info.PrimaryKeys
-										.Where(pk => !columnsToIgnore.Contains(pk))
-										.Cast<IPropertyInfo>()
-										.Concat(info.ForeignKeys)
-										.Concat(info.OtherColumns)
+			var columnsToInsert = info.Columns
+										.Where(column => !idrecordColumns.Contains(column.Property))
 										.ToList();
 
-			return $"INSERT INTO {entity.TableName} ({string.Join(", ", columnsToInsert.Select(column => column.Name))}) OUTPUT inserted.* VALUES ({string.Join(", ", columnsToInsert.Select(column => "@" + column.Name))})";
+			return $"INSERT INTO {record.TableName} ({string.Join(", ", columnsToInsert.Select(column => column.ColumnName))}) OUTPUT inserted.* VALUES ({string.Join(", ", columnsToInsert.Select(column => $"@{column.Name}"))})";
+		}
+
+		public string GenerateGetAllQuery(string tableName)
+		{
+			if (tableName == null)
+			{
+				throw new ArgumentNullException(nameof(tableName));
+			}
+
+			return $"SELECT * FROM {tableName}";
+		}
+
+		public string GenerateGetQuery<TRecord>(TRecord record)
+			where TRecord : BaseTableRecord
+		{
+			if (record == null)
+			{
+				throw new ArgumentNullException(nameof(record));
+			}
+
+			var info = RecordInformationCache.GetRecordInformation(record);
+			if (!info.PrimaryKeys.Any())
+			{
+				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKey].");
+			}
+
+			return $"SELECT * FROM {record.TableName} WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
+		}
+
+		public string GenerateUpdateQuery<TRecord>(TRecord record)
+			where TRecord : BaseTableRecord
+		{
+			if (record == null)
+			{
+				throw new ArgumentNullException(nameof(record));
+			}
+
+			var info = RecordInformationCache.GetRecordInformation(record);
+			if (!info.PrimaryKeys.Any())
+			{
+				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKey].");
+			}
+
+			var setClause = GenerateSetClause(info);
+
+			return $"UPDATE {record.TableName} SET {setClause} OUTPUT inserted.* WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
+		}
+
+
+		private string GenerateSetClause(RecordInformation info)
+		{
+			var primaryKeys = info.PrimaryKeys.Select(pk => pk.Property).ToList();
+			var columnsToSet = info.Columns.Where(column => !primaryKeys.Contains(column.Property));
+			return string.Join(", ", columnsToSet.Select(column => $"{column.ColumnName} = @{column.Name}"));
+		}
+
+		private string GenerateWhereClauseWithoutPrimaryKey(RecordInformation info)
+		{
+			return string.Join(" AND ", info.Columns.Select(column => $"{column.ColumnName} = @{column.Name}"));
+		}
+
+		private string GenerateWhereClauseWithPrimaryKeys(RecordInformation info)
+		{
+			var primaryKeyProperties = info.PrimaryKeys.Select(pk => pk.Property).ToList();
+			var primaryKeys = info.Columns
+								.Where(column => primaryKeyProperties.Contains(column.Property));
+
+			return string.Join(" AND ", primaryKeys.Select(column => $"{column.ColumnName} = @{column.Name}"));
 		}
 	}
 }

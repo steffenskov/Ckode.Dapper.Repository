@@ -4,17 +4,17 @@ using Ckode.Dapper.Repository.Attributes;
 
 namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 {
-	internal class ForeignKeyPropertyInfo : IPropertyInfo
+	internal class ColumnPropertyInfo : IPropertyInfo
 	{
-		public string ReferencedColumnName { get; init; }
+		public string ColumnName { get; init; }
 		public PropertyInfo Property { get; init; }
 		public string Name => Property.Name;
 		public Type Type => Property.PropertyType;
 
-		public ForeignKeyPropertyInfo(PropertyInfo property, ForeignKeyAttribute foreignKey)
+		public ColumnPropertyInfo(PropertyInfo property, ColumnAttribute column)
 		{
 			Property = property;
-			ReferencedColumnName = foreignKey.ReferencedColumnName ?? property.Name;
+			ColumnName = column.ColumnName ?? property.Name;
 		}
 	}
 }

@@ -2,15 +2,20 @@
 
 namespace Ckode.Dapper.Repository.Tests
 {
-	internal record SinglePrimaryKeyRecord : BaseTableRecord
+	public record SinglePrimaryKeyRecord : BaseTableRecord
 	{
 		public SinglePrimaryKeyRecord()
 		{
 		}
 
-		[PrimaryKey]
+		[PrimaryKey(IsIdrecord = true)]
+		[Column]
 		public int Id { get; init; }
+
+		[Column]
 		public string Username { get; init; }
+
+		[Column]
 		public string Password { get; init; }
 
 		public override string TableName => "Users";

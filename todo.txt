@@ -1,0 +1,1 @@
+Test for missing primary keys when doing delete, update, select (though not in the SQL Generator, but rather in the repository or whatever helper it'll have)

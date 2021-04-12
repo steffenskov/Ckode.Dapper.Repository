@@ -80,7 +80,7 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 				setter = (Action<object, object>)dm.CreateDelegate(typeof(Action<object, object>));
 			}
 		}
-		public MemberAccessor(FieldInfo field)
+		/*public MemberAccessor(FieldInfo field)
 		{
 			if (field == null)
 			{
@@ -121,6 +121,6 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 			il.Emit(OpCodes.Stfld, field);
 			il.Emit(OpCodes.Ret);
 			setter = (Action<object, object>)method.CreateDelegate(typeof(Action<object, object>));
-		}
+		}*/
 	}
 }

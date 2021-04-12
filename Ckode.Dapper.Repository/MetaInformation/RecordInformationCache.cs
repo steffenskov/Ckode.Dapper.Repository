@@ -40,25 +40,31 @@ namespace Ckode.Dapper.Repository.MetaInformation
 			var properties = TypeCache.GetProperties(record);
 			var primaryKeys = new List<PrimaryKeyPropertyInfo>();
 			var foreignKeys = new List<ForeignKeyPropertyInfo>();
-			var otherColumns = new List<NormalPropertyInfo>();
+			var columns = new List<ColumnPropertyInfo>();
 
 			foreach (var prop in properties)
 			{
-				if (prop.GetCustomAttribute<PrimaryKeyAttribute>() != null)
+				var column = prop.GetCustomAttribute<ColumnAttribute>();
+				if (column == null)
 				{
-					primaryKeys.Add(new PrimaryKeyPropertyInfo(prop));
+					continue;
 				}
-				else if (prop.GetCustomAttribute<ForeignKeyAttribute>() != null)
+
+				columns.Add(new ColumnPropertyInfo(prop, column));
+				var primaryKey = prop.GetCustomAttribute<PrimaryKeyAttribute>();
+				var foreignKey = prop.GetCustomAttribute<ForeignKeyAttribute>();
+
+				if (primaryKey != null)
 				{
-					foreignKeys.Add(new ForeignKeyPropertyInfo(prop));
+					primaryKeys.Add(new PrimaryKeyPropertyInfo(prop, primaryKey));
 				}
-				else if (prop.Name != nameof(record.TableName))
+				if (foreignKey != null)
 				{
-					otherColumns.Add(new NormalPropertyInfo(prop));
+					foreignKeys.Add(new ForeignKeyPropertyInfo(prop, foreignKey));
 				}
 			}
 
-			return new RecordInformation(primaryKeys.AsReadOnly(), foreignKeys.AsReadOnly(), otherColumns.AsReadOnly());
+			return new RecordInformation(primaryKeys.AsReadOnly(), foreignKeys.AsReadOnly(), columns.AsReadOnly());
 		}
 	}
 }

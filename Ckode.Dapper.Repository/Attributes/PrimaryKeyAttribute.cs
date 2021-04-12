@@ -7,8 +7,17 @@ namespace Ckode.Dapper.Repository.Attributes
 	/// </summary>
 	public class PrimaryKeyAttribute : Attribute
 	{
-		public PrimaryKeyAttribute()
+		/// <summary>
+		/// Whether this primary key is an idrecord column (auto incrementing value)
+		/// </summary>
+		public bool IsIdrecord { get; init; }
+
+		/// <summary>
+		/// </summary>
+		/// <param name="isIdrecord">Whether this primary key is an idrecord column (auto incrementing value)</param>
+		public PrimaryKeyAttribute(bool isIdrecord = false)
 		{
+			IsIdrecord = IsIdrecord;
 		}
 	}
 }
