@@ -1,6 +1,6 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests
+namespace Ckode.Dapper.Repository.Tests.Records
 {
 	public record SinglePrimaryKeyRecord : BaseTableRecord
 	{
@@ -8,7 +8,7 @@ namespace Ckode.Dapper.Repository.Tests
 		{
 		}
 
-		[PrimaryKey(IsIdrecord = true)]
+		[PrimaryKey(IsIdentity = true)]
 		[Column]
 		public int Id { get; init; }
 
@@ -17,7 +17,5 @@ namespace Ckode.Dapper.Repository.Tests
 
 		[Column]
 		public string Password { get; init; }
-
-		public override string TableName => "Users";
 	}
 }

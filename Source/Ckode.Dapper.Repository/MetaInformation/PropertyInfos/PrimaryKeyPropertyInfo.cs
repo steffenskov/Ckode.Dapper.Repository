@@ -7,16 +7,16 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 	internal class PrimaryKeyPropertyInfo : IPropertyInfo
 	{
 		private readonly MemberAccessor _accessor;
-		private readonly object _defaultValue;
-		public bool IsIdrecord { get; init; }
+		private readonly object? _defaultValue;
+		public bool IsIdentity { get; init; }
 		public PropertyInfo Property { get; init; }
 		public string Name => Property.Name;
 		public Type Type => Property.PropertyType;
 
-		public PrimaryKeyPropertyInfo(PropertyInfo property, PrimaryKeyAttribute primaryKey) // PrimaryKeyAttribute currently doesn't contain any information, however it's kept for future usage, e.g. Idrecord information
+		public PrimaryKeyPropertyInfo(PropertyInfo property, PrimaryKeyAttribute primaryKey) // PrimaryKeyAttribute currently doesn't contain any information, however it's kept for future usage, e.g. Identity information
 		{
 			Property = property;
-			IsIdrecord = primaryKey.IsIdrecord;
+			IsIdentity = primaryKey.IsIdentity;
 			var type = property.PropertyType;
 			_accessor = new MemberAccessor(property);
 			if (type.IsValueType)
@@ -34,6 +34,11 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 			var value = _accessor.getter(record);
 
 			return value == _defaultValue || value?.Equals(_defaultValue) == true;
+		}
+
+		public object GetValue<T>(T record) where T : BaseTableRecord
+		{
+			return _accessor.getter(record);
 		}
 	}
 }

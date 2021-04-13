@@ -1,6 +1,6 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests
+namespace Ckode.Dapper.Repository.Tests.Records
 {
 	public record Heap : BaseTableRecord
 	{
@@ -9,8 +9,5 @@ namespace Ckode.Dapper.Repository.Tests
 
 		[Column]
 		public string Password { get; init; }
-
-
-		public override string TableName => "Heaps";
 	}
 }

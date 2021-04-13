@@ -8,6 +8,22 @@ namespace Ckode.Dapper.Repository
 {
 	internal class SQLGenerator
 	{
+		private readonly string _tableName;
+
+		public SQLGenerator(string tableName)
+		{
+			if (tableName == null)
+			{
+				throw new ArgumentNullException(nameof(tableName));
+			}
+
+			if (string.IsNullOrWhiteSpace(tableName))
+			{
+				throw new ArgumentException($"Invalid tableName: {tableName}", nameof(tableName));
+			}
+			_tableName = tableName;
+		}
+
 		public string GenerateDeleteQuery<TRecord>(TRecord record)
 			where TRecord : BaseTableRecord
 		{
@@ -27,7 +43,7 @@ namespace Ckode.Dapper.Repository
 				whereClause = GenerateWhereClauseWithPrimaryKeys(info);
 			}
 
-			return $"DELETE FROM {record.TableName} OUTPUT deleted.* WHERE {whereClause}";
+			return $"DELETE FROM {_tableName} OUTPUT deleted.* WHERE {whereClause}";
 		}
 
 		public string GenerateInsertQuery<TRecord>(TRecord record)
@@ -39,23 +55,18 @@ namespace Ckode.Dapper.Repository
 			}
 
 			var info = RecordInformationCache.GetRecordInformation(record);
-			var idrecordColumns = info.PrimaryKeys.Where(pk => pk.IsIdrecord).Select(pk => pk.Property).ToList();
+			var identityColumns = info.PrimaryKeys.Where(pk => pk.IsIdentity).Select(pk => pk.Property).ToList();
 
 			var columnsToInsert = info.Columns
-										.Where(column => !idrecordColumns.Contains(column.Property))
+										.Where(column => !identityColumns.Contains(column.Property))
 										.ToList();
 
-			return $"INSERT INTO {record.TableName} ({string.Join(", ", columnsToInsert.Select(column => column.ColumnName))}) OUTPUT inserted.* VALUES ({string.Join(", ", columnsToInsert.Select(column => $"@{column.Name}"))})";
+			return $"INSERT INTO {_tableName} ({string.Join(", ", columnsToInsert.Select(column => column.ColumnName))}) OUTPUT inserted.* VALUES ({string.Join(", ", columnsToInsert.Select(column => $"@{column.Name}"))})";
 		}
 
-		public string GenerateGetAllQuery(string tableName)
+		public string GenerateGetAllQuery()
 		{
-			if (tableName == null)
-			{
-				throw new ArgumentNullException(nameof(tableName));
-			}
-
-			return $"SELECT * FROM {tableName}";
+			return $"SELECT * FROM {_tableName}";
 		}
 
 		public string GenerateGetQuery<TRecord>(TRecord record)
@@ -72,7 +83,7 @@ namespace Ckode.Dapper.Repository
 				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKey].");
 			}
 
-			return $"SELECT * FROM {record.TableName} WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
+			return $"SELECT * FROM {_tableName} WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
 		}
 
 		public string GenerateUpdateQuery<TRecord>(TRecord record)
@@ -91,23 +102,23 @@ namespace Ckode.Dapper.Repository
 
 			var setClause = GenerateSetClause(info);
 
-			return $"UPDATE {record.TableName} SET {setClause} OUTPUT inserted.* WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
+			return $"UPDATE {_tableName} SET {setClause} OUTPUT inserted.* WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
 		}
 
 
-		private string GenerateSetClause(RecordInformation info)
+		private static string GenerateSetClause(RecordInformation info)
 		{
 			var primaryKeys = info.PrimaryKeys.Select(pk => pk.Property).ToList();
 			var columnsToSet = info.Columns.Where(column => !primaryKeys.Contains(column.Property));
 			return string.Join(", ", columnsToSet.Select(column => $"{column.ColumnName} = @{column.Name}"));
 		}
 
-		private string GenerateWhereClauseWithoutPrimaryKey(RecordInformation info)
+		private static string GenerateWhereClauseWithoutPrimaryKey(RecordInformation info)
 		{
 			return string.Join(" AND ", info.Columns.Select(column => $"{column.ColumnName} = @{column.Name}"));
 		}
 
-		private string GenerateWhereClauseWithPrimaryKeys(RecordInformation info)
+		private static string GenerateWhereClauseWithPrimaryKeys(RecordInformation info)
 		{
 			var primaryKeyProperties = info.PrimaryKeys.Select(pk => pk.Property).ToList();
 			var primaryKeys = info.Columns

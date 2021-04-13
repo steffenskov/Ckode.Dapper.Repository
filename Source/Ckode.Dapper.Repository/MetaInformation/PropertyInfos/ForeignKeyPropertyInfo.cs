@@ -6,7 +6,7 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 {
 	internal class ForeignKeyPropertyInfo : IPropertyInfo
 	{
-		public string ReferencedColumnName { get; init; }
+		public string ReferencedPropertyName { get; init; }
 		public PropertyInfo Property { get; init; }
 		public string Name => Property.Name;
 		public Type Type => Property.PropertyType;
@@ -14,7 +14,7 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 		public ForeignKeyPropertyInfo(PropertyInfo property, ForeignKeyAttribute foreignKey)
 		{
 			Property = property;
-			ReferencedColumnName = foreignKey.ReferencedColumnName ?? property.Name;
+			ReferencedPropertyName = foreignKey.ReferencedPropertyName ?? property.Name;
 		}
 	}
 }

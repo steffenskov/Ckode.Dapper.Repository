@@ -1,7 +1,7 @@
 ﻿using System;
 using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests
+namespace Ckode.Dapper.Repository.Tests.Records
 {
 	internal record CompositePrimaryKeyRecord : BaseTableRecord
 	{
@@ -15,7 +15,5 @@ namespace Ckode.Dapper.Repository.Tests
 
 		[Column]
 		public DateTime DateCreated { get; init; }
-
-		public override string TableName => "Users";
 	}
 }

@@ -1,31 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using Ckode.Dapper.Repository.MetaInformation;
 
 namespace Ckode.Dapper.Repository
 {
 	public abstract class DapperSQLRepository<TRecord> : IRepository<TRecord>
 		where TRecord : BaseTableRecord
 	{
+		#region Dapper delegates
+
+		protected delegate T QuerySingleDelegate<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
+
+		#endregion
+
 		private readonly SQLGenerator generator;
 
 		public DapperSQLRepository()
 		{
-			generator = new SQLGenerator();
+			generator = new SQLGenerator(TableName);
 		}
+
+		protected abstract string TableName { get; }
 
 		protected abstract IDbConnection CreateConnection();
 
-		// TODO: Make abstract methods for injecting dapper functionality
+		#region Injection points for Dapper methods
+
+		protected abstract QuerySingleDelegate<TRecord> QuerySingle { get; }
+
+		protected abstract QuerySingleDelegate<TRecord> QuerySingleOrDefault { get; }
+
+		#endregion
 
 		public TRecord Delete(TRecord record)
 		{
 			var query = generator.GenerateDeleteQuery(record);
-			using (var connection = CreateConnection())
-			{
-				// TODO: Execute query
-			}
-			return record;
+			using var connection = CreateConnection();
+			return QuerySingleOrDefault.Invoke(connection, query, record);
 		}
 
 		public TRecord Get(TRecord record)
@@ -45,9 +58,20 @@ namespace Ckode.Dapper.Repository
 
 		public TRecord Insert(TRecord record)
 		{
+			var info = RecordInformationCache.GetRecordInformation(record);
+
+			var invalidIdentityColumns = info.PrimaryKeys
+												.Where(pk => pk.IsIdentity && !pk.HasDefaultValue(record))
+												.ToList();
+
+			if (invalidIdentityColumns.Any())
+			{
+				throw new ArgumentException($"record has the following primary keys marked with IsIdentity, which have non-default values: {string.Join(", ", invalidIdentityColumns.Select(col => col.Name))}", nameof(record));
+			}
+
 			var query = generator.GenerateInsertQuery(record);
-			// Invoke dapper query on connection
-			return record;
+			using var connection = CreateConnection();
+			return QuerySingle.Invoke(connection, query, record);
 		}
 
 		public TRecord Update(TRecord record)

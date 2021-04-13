@@ -22,7 +22,12 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 		{
 			if (property == null)
 			{
-				throw new ArgumentNullException();
+				throw new ArgumentNullException(nameof(property));
+			}
+
+			if (property.DeclaringType == null)
+			{
+				throw new ArgumentException($"property.DeclaringType is null", nameof(property));
 			}
 
 			name = property.Name;
@@ -38,10 +43,10 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 					throw new ArgumentException("Static properties not supported");
 				}
 
-				var dm = new DynamicMethod("__get_" + property.Name, typeof(object), new Type[] { typeof(object) }, property.DeclaringType);
+				var dm = new DynamicMethod("__get_" + property.Name, typeof(object), new Type[] { typeof(object) }, property.DeclaringType!);
 				var il = dm.GetILGenerator();
 				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Castclass, property.DeclaringType);
+				il.Emit(OpCodes.Castclass, property.DeclaringType!);
 				il.Emit(OpCodes.Callvirt, method);
 				if (property.PropertyType.IsValueType)
 				{
@@ -62,10 +67,10 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 					throw new ArgumentException("Static properties not supported");
 				}
 
-				var dm = new DynamicMethod("__set_" + property.Name, null, new Type[] { typeof(object), typeof(object) }, property.DeclaringType);
+				var dm = new DynamicMethod("__set_" + property.Name, null, new Type[] { typeof(object), typeof(object) }, property.DeclaringType!);
 				var il = dm.GetILGenerator();
 				il.Emit(OpCodes.Ldarg_0);
-				il.Emit(OpCodes.Castclass, property.DeclaringType);
+				il.Emit(OpCodes.Castclass, property.DeclaringType!);
 				il.Emit(OpCodes.Ldarg_1);
 				if (property.PropertyType.IsValueType)
 				{
