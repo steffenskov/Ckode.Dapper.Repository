@@ -3,7 +3,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Ckode.Dapper.Repository.MetaInformation;
 
-[assembly: InternalsVisibleTo("Ckode.Dapper.Repository.Tests")]
+[assembly: InternalsVisibleTo("Ckode.Dapper.Repository.UnitTests")]
 namespace Ckode.Dapper.Repository
 {
 	internal class SQLGenerator

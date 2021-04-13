@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ckode.Dapper.Repository\Ckode.Dapper.Repository.csproj" />
+    <ProjectReference Include="..\..\Source\Ckode.Dapper.Repository\Ckode.Dapper.Repository.csproj" />
   </ItemGroup>
 
 </Project>
