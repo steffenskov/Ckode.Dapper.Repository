@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ckode.Dapper.Repository", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ckode.Dapper.Repository.UnitTests", "Tests\Ckode.Dapper.Repository.UnitTests\Ckode.Dapper.Repository.UnitTests.csproj", "{7DA6881F-4BAA-4DD9-A89F-42677C972D3D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{4BF60D10-4A76-486A-8E0E-BA6B9160ECC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DE13D591-5D8D-4F8E-AFF3-EAD3A83A0C03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +28,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{40235C90-3FB1-42E7-8F12-9A2446996B6B} = {4BF60D10-4A76-486A-8E0E-BA6B9160ECC1}
+		{7DA6881F-4BAA-4DD9-A89F-42677C972D3D} = {DE13D591-5D8D-4F8E-AFF3-EAD3A83A0C03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0E12410A-5F7F-4D98-A731-324E2D5540D3}
