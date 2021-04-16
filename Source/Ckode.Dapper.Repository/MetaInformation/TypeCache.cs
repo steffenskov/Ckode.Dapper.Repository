@@ -13,7 +13,7 @@ namespace Ckode.Dapper.Repository.MetaInformation
 			_cache = new ConcurrentDictionary<Type, IList<PropertyInfo>>();
 		}
 
-		public static IList<PropertyInfo> GetProperties<T>(T obj)
+		public static IList<PropertyInfo> GetProperties<T>()
 		{
 			var type = typeof(T);
 			if (!_cache.TryGetValue(type, out var result))

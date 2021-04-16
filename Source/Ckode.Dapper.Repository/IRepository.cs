@@ -2,12 +2,15 @@
 
 namespace Ckode.Dapper.Repository
 {
-	internal interface IRepository<TRecord> where TRecord : BaseTableRecord
+	internal interface IRepository<TPrimaryKeyRecord, TRecord>
+		where
+			TPrimaryKeyRecord : BaseTableRecord
+		where TRecord : TPrimaryKeyRecord
 	{
-		TRecord Get(TRecord record);
+		TRecord Get(TPrimaryKeyRecord record);
 		TRecord Insert(TRecord record);
 		TRecord Update(TRecord record);
-		TRecord Delete(TRecord record);
+		TRecord Delete(TPrimaryKeyRecord record);
 		IEnumerable<TRecord> GetAll();
 	}
 }

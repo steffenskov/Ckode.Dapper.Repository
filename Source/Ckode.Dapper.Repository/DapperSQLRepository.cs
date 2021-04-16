@@ -6,13 +6,14 @@ using Ckode.Dapper.Repository.MetaInformation;
 
 namespace Ckode.Dapper.Repository
 {
-	public abstract class DapperSQLRepository<TRecord> : IRepository<TRecord>
-		where TRecord : BaseTableRecord
+	public abstract class DapperSQLRepository<TPrimaryKeyRecord, TRecord> : IRepository<TPrimaryKeyRecord, TRecord>
+		where TPrimaryKeyRecord : BaseTableRecord
+		where TRecord : TPrimaryKeyRecord
 	{
 		#region Dapper delegates
 
 		protected delegate T QuerySingleDelegate<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-
+		protected delegate IEnumerable<T> QueryDelegate<T>(IDbConnection cnn, string sql, object param = null, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null);
 		#endregion
 
 		private readonly SQLGenerator generator;
@@ -32,33 +33,49 @@ namespace Ckode.Dapper.Repository
 
 		protected abstract QuerySingleDelegate<TRecord> QuerySingleOrDefault { get; }
 
+		protected abstract QueryDelegate<TRecord> Query { get; }
+
 		#endregion
 
-		public TRecord Delete(TRecord record)
+		public TRecord Delete(TPrimaryKeyRecord record)
 		{
-			var query = generator.GenerateDeleteQuery(record);
+			if (record == null)
+			{
+				throw new ArgumentNullException(nameof(record));
+			}
+
+			var query = generator.GenerateDeleteQuery<TRecord>();
 			using var connection = CreateConnection();
 			return QuerySingleOrDefault.Invoke(connection, query, record);
 		}
 
-		public TRecord Get(TRecord record)
+		public TRecord Get(TPrimaryKeyRecord record)
 		{
-			var query = generator.GenerateGetQuery(record);
-			// Invoke dapper query on connection
-			return record;
+			if (record == null)
+			{
+				throw new ArgumentNullException(nameof(record));
+			}
+
+			var query = generator.GenerateGetQuery<TRecord>();
+			using var connection = CreateConnection();
+			return QuerySingleOrDefault.Invoke(connection, query, record);
 		}
 
 		public IEnumerable<TRecord> GetAll()
 		{
-			// TODO: How do I get table name here?
-			// Depend on service locator maybe? not the prettiest solution....
-
-			throw new NotImplementedException();
+			var query = generator.GenerateGetAllQuery<TRecord>();
+			using var connection = CreateConnection();
+			return Query.Invoke(connection, query);
 		}
 
 		public TRecord Insert(TRecord record)
 		{
-			var info = RecordInformationCache.GetRecordInformation(record);
+			if (record == null)
+			{
+				throw new ArgumentNullException(nameof(record));
+			}
+
+			var info = RecordInformationCache.GetRecordInformation<TRecord>();
 
 			var invalidIdentityColumns = info.PrimaryKeys
 												.Where(pk => pk.IsIdentity && !pk.HasDefaultValue(record))
@@ -69,14 +86,19 @@ namespace Ckode.Dapper.Repository
 				throw new ArgumentException($"record has the following primary keys marked with IsIdentity, which have non-default values: {string.Join(", ", invalidIdentityColumns.Select(col => col.Name))}", nameof(record));
 			}
 
-			var query = generator.GenerateInsertQuery(record);
+			var query = generator.GenerateInsertQuery<TRecord>();
 			using var connection = CreateConnection();
 			return QuerySingle.Invoke(connection, query, record);
 		}
 
 		public TRecord Update(TRecord record)
 		{
-			var query = generator.GenerateUpdateQuery(record);
+			if (record == null)
+			{
+				throw new ArgumentNullException(nameof(record));
+			}
+
+			var query = generator.GenerateUpdateQuery<TRecord>();
 			// Invoke dapper query on connection
 			return record;
 		}

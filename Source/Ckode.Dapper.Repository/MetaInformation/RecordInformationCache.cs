@@ -17,7 +17,7 @@ namespace Ckode.Dapper.Repository.MetaInformation
 			_cache = new ConcurrentDictionary<Type, RecordInformation>();
 		}
 
-		public static RecordInformation GetRecordInformation<TRecord>(TRecord record)
+		public static RecordInformation GetRecordInformation<TRecord>()
 			where TRecord : BaseTableRecord
 		{
 			var type = typeof(TRecord);
@@ -27,17 +27,17 @@ namespace Ckode.Dapper.Repository.MetaInformation
 				{
 					if (!_cache.TryGetValue(type, out result))
 					{
-						_cache[type] = result = CreateRecordInformation(record);
+						_cache[type] = result = CreateRecordInformation<TRecord>();
 					}
 				}
 			}
 			return result;
 		}
 
-		private static RecordInformation CreateRecordInformation<TRecord>(TRecord record)
+		private static RecordInformation CreateRecordInformation<TRecord>()
 			where TRecord : BaseTableRecord
 		{
-			var properties = TypeCache.GetProperties(record);
+			var properties = TypeCache.GetProperties<TRecord>();
 			var primaryKeys = new List<PrimaryKeyPropertyInfo>();
 			var foreignKeys = new List<ForeignKeyPropertyInfo>();
 			var columns = new List<ColumnPropertyInfo>();

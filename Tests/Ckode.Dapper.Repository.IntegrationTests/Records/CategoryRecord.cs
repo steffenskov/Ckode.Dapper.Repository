@@ -2,12 +2,15 @@
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Records
 {
-	public record CategoryRecord : BaseTableRecord
+	public record CategoryPrimaryKeyRecord : BaseTableRecord
 	{
 		[PrimaryKey(true)]
 		[Column("CategoryID")]
 		public int CategoryId { get; init; }
+	}
 
+	public record CategoryRecord : CategoryPrimaryKeyRecord
+	{
 		[Column("CategoryName")]
 		public string Name { get; init; }
 
