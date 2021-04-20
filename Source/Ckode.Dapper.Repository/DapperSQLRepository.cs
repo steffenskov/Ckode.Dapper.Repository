@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Ckode.Dapper.Repository.MetaInformation;
+using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
 namespace Ckode.Dapper.Repository
 {
@@ -44,9 +45,14 @@ namespace Ckode.Dapper.Repository
                 throw new ArgumentNullException(nameof(record));
             }
 
+            var info = RecordInformationCache.GetRecordInformation<TRecord>();
+
+            CheckForDefaultPrimaryKeys(info, record);
+
             var query = generator.GenerateDeleteQuery<TRecord>();
-            using var connection = CreateConnection();
-            return QuerySingleOrDefault.Invoke(connection, query, record);
+            var result = ExecuteQueryOrDefault(record, query);
+
+            return ReturnOrThrowIfRecordIsNull(record, info, result, query);
         }
 
         public TRecord Get(TPrimaryKeyRecord record)
@@ -56,11 +62,15 @@ namespace Ckode.Dapper.Repository
                 throw new ArgumentNullException(nameof(record));
             }
 
-            var query = generator.GenerateGetQuery<TRecord>();
-            using var connection = CreateConnection();
-            return QuerySingleOrDefault.Invoke(connection, query, record);
-        }
+            var info = RecordInformationCache.GetRecordInformation<TRecord>();
 
+            CheckForDefaultPrimaryKeys(info, record);
+
+            var query = generator.GenerateGetQuery<TRecord>();
+            var result = ExecuteQueryOrDefault(record, query);
+
+            return ReturnOrThrowIfRecordIsNull(record, info, result, query);
+        }
         public IEnumerable<TRecord> GetAll()
         {
             var query = generator.GenerateGetAllQuery<TRecord>();
@@ -98,9 +108,58 @@ namespace Ckode.Dapper.Repository
                 throw new ArgumentNullException(nameof(record));
             }
 
+            var info = RecordInformationCache.GetRecordInformation<TRecord>();
+
+            CheckForDefaultPrimaryKeys(info, record);
+
             var query = generator.GenerateUpdateQuery<TRecord>();
-            // Invoke dapper query on connection
-            return record;
+            var result = ExecuteQueryOrDefault(record, query);
+
+            return ReturnOrThrowIfRecordIsNull(record, info, result, query);
+        }
+
+
+        private static void CheckForDefaultPrimaryKeys(RecordInformation info, TPrimaryKeyRecord record)
+        {
+            var invalidPrimaryKeys = info.PrimaryKeys
+                                               .Where(pk => pk.HasDefaultValue(record))
+                                               .ToList();
+
+            if (invalidPrimaryKeys.Any())
+            {
+                throw new ArgumentException($"record has the following primary keys which have default values: {string.Join(", ", invalidPrimaryKeys.Select(col => col.Name))}", nameof(record));
+            }
+        }
+
+        private static TRecord ReturnOrThrowIfRecordIsNull(TPrimaryKeyRecord record, RecordInformation info, TRecord? result, string query)
+        {
+            if (result == null)
+            {
+                var formattedPrimaryKeys = PrintPrimaryKeys(info.PrimaryKeys, record);
+                throw new NoRecordFoundException(query, formattedPrimaryKeys, $"No matching record found with the given primary keys.");
+            }
+            return result;
+        }
+
+        private TRecord? ExecuteQueryOrDefault(TPrimaryKeyRecord record, string query)
+        {
+            using var connection = CreateConnection();
+            return QuerySingleOrDefault.Invoke(connection, query, record);
+        }
+
+
+        private static string PrintPrimaryKeys(IReadOnlyCollection<PrimaryKeyPropertyInfo> primaryKeys, TPrimaryKeyRecord record)
+        {
+            return string.Join(Environment.NewLine, primaryKeys.Select(pk => $"{pk.Name} = {FormatPrimaryKeyValue(pk, record)}"));
+        }
+
+        private static string FormatPrimaryKeyValue(PrimaryKeyPropertyInfo primaryKey, TPrimaryKeyRecord record)
+        {
+            var valueAsString = primaryKey.GetValue(record)?.ToString() ?? "null";
+            if (primaryKey.Type == typeof(string))
+                return $@"""{valueAsString}""";
+            else
+                return valueAsString;
         }
     }
 }
