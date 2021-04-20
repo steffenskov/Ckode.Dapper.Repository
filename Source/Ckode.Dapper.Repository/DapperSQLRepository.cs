@@ -8,7 +8,7 @@ using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 namespace Ckode.Dapper.Repository
 {
     public abstract class DapperSQLRepository<TPrimaryKeyRecord, TRecord> : IRepository<TPrimaryKeyRecord, TRecord>
-        where TPrimaryKeyRecord : BaseTableRecord
+        where TPrimaryKeyRecord : TableRecord
         where TRecord : TPrimaryKeyRecord
     {
         #region Dapper delegates

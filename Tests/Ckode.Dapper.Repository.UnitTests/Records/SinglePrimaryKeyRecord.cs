@@ -2,7 +2,7 @@
 
 namespace Ckode.Dapper.Repository.Tests.Records
 {
-    public record SinglePrimaryKeyRecord : BaseTableRecord
+    public record SinglePrimaryKeyRecord : TableRecord
     {
         public SinglePrimaryKeyRecord()
         {

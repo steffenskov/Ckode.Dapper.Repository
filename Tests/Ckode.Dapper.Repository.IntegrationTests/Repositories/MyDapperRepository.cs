@@ -4,8 +4,8 @@ using SqlMapper = Dapper.SqlMapper;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
-    public abstract class BaseRepository<TPrimaryKeyRecord, TRecord> : DapperSQLRepository<TPrimaryKeyRecord, TRecord>
-        where TPrimaryKeyRecord : BaseTableRecord
+    public abstract class MyDapperRepository<TPrimaryKeyRecord, TRecord> : DapperSQLRepository<TPrimaryKeyRecord, TRecord>
+        where TPrimaryKeyRecord : TableRecord
         where TRecord : TPrimaryKeyRecord
     {
         private const string _connectionString = @"Server=localhost;Database=Northwind;User Id=sa;Password=SqlServer2019;";

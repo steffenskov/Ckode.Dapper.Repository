@@ -2,8 +2,8 @@
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
-	public class CategoryRepository : BaseRepository<CategoryPrimaryKeyRecord, CategoryRecord>
-	{
-		protected override string TableName => "Categories";
-	}
+    public class CategoryRepository : MyDapperRepository<CategoryPrimaryKeyRecord, CategoryRecord>
+    {
+        protected override string TableName => "Categories";
+    }
 }
