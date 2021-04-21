@@ -33,7 +33,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var deleteQuery = generator.GenerateDeleteQuery<SinglePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"DELETE FROM [Users] OUTPUT [deleted].[Id], [deleted].[Username], [deleted].[Password] WHERE [Users].[Id] = @Id", deleteQuery);
+			Assert.Equal($"DELETE FROM [dbo].[Users] OUTPUT [deleted].[Id], [deleted].[Username], [deleted].[Password] WHERE [dbo].[Users].[Id] = @Id", deleteQuery);
 		}
 
 		[Fact]
@@ -46,7 +46,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var deleteQuery = generator.GenerateDeleteQuery<CompositePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"DELETE FROM [Users] OUTPUT [deleted].[Username], [deleted].[Password], [deleted].[DateCreated] WHERE [Users].[Username] = @Username AND [Users].[Password] = @Password", deleteQuery);
+			Assert.Equal($"DELETE FROM [dbo].[Users] OUTPUT [deleted].[Username], [deleted].[Password], [deleted].[DateCreated] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", deleteQuery);
 		}
 
 		[Fact]
@@ -59,7 +59,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var deleteQuery = generator.GenerateDeleteQuery<CustomColumnNamesRecord>();
 
 			// Assert
-			Assert.Equal($"DELETE FROM [Orders] OUTPUT [deleted].[OrderId] AS [Id], [deleted].[DateCreated] AS [Date] WHERE [Orders].[OrderId] = @Id", deleteQuery);
+			Assert.Equal($"DELETE FROM [dbo].[Orders] OUTPUT [deleted].[OrderId] AS [Id], [deleted].[DateCreated] AS [Date] WHERE [dbo].[Orders].[OrderId] = @Id", deleteQuery);
 		}
 
 		[Fact]
@@ -72,7 +72,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var deleteQuery = generator.GenerateDeleteQuery<Heap>();
 
 			// Assert
-			Assert.Equal($"DELETE FROM [Users] OUTPUT [deleted].[Username], [deleted].[Password] WHERE [Users].[Username] = @Username AND [Users].[Password] = @Password", deleteQuery);
+			Assert.Equal($"DELETE FROM [dbo].[Users] OUTPUT [deleted].[Username], [deleted].[Password] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", deleteQuery);
 		}
 		#endregion
 
@@ -87,7 +87,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var insertQuery = generator.GenerateInsertQuery<SinglePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"INSERT INTO [Users] ([Username], [Password]) OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
+			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password]) OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
 		}
 
 		[Fact]
@@ -100,7 +100,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var insertQuery = generator.GenerateInsertQuery<CompositePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"INSERT INTO [Users] ([Username], [Password], [DateCreated]) OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] VALUES (@Username, @Password, @DateCreated)", insertQuery);
+			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password], [DateCreated]) OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] VALUES (@Username, @Password, @DateCreated)", insertQuery);
 		}
 
 		[Fact]
@@ -113,7 +113,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var insertQuery = generator.GenerateInsertQuery<CompositePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"INSERT INTO [Users] ([Username], [Password], [DateCreated]) OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] VALUES (@Username, @Password, @DateCreated)", insertQuery);
+			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password], [DateCreated]) OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] VALUES (@Username, @Password, @DateCreated)", insertQuery);
 		}
 
 		[Fact]
@@ -126,7 +126,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var insertQuery = generator.GenerateInsertQuery<CustomColumnNamesRecord>();
 
 			// Assert
-			Assert.Equal($"INSERT INTO [Orders] ([DateCreated]) OUTPUT [inserted].[OrderId] AS [Id], [inserted].[DateCreated] AS [Date] VALUES (@Date)", insertQuery);
+			Assert.Equal($"INSERT INTO [dbo].[Orders] ([DateCreated]) OUTPUT [inserted].[OrderId] AS [Id], [inserted].[DateCreated] AS [Date] VALUES (@Date)", insertQuery);
 		}
 
 		[Fact]
@@ -139,7 +139,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var insertQuery = generator.GenerateInsertQuery<Heap>();
 
 			// Assert
-			Assert.Equal($"INSERT INTO [Users] ([Username], [Password]) OUTPUT [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
+			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password]) OUTPUT [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
 		}
 		#endregion
 
@@ -154,7 +154,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var selectQuery = generator.GenerateGetAllQuery<Heap>();
 
 			// Assert
-			Assert.Equal($"SELECT [Users].[Username], [Users].[Password] FROM [Users]", selectQuery);
+			Assert.Equal($"SELECT [dbo].[Users].[Username], [dbo].[Users].[Password] FROM [dbo].[Users]", selectQuery);
 		}
 
 		[Fact]
@@ -167,7 +167,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var selectQuery = generator.GenerateGetAllQuery<CustomColumnNamesRecord>();
 
 			// Assert
-			Assert.Equal($"SELECT [Orders].[OrderId] AS [Id], [Orders].[DateCreated] AS [Date] FROM [Orders]", selectQuery);
+			Assert.Equal($"SELECT [dbo].[Orders].[OrderId] AS [Id], [dbo].[Orders].[DateCreated] AS [Date] FROM [dbo].[Orders]", selectQuery);
 		}
 		#endregion
 
@@ -182,7 +182,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var selectQuery = generator.GenerateGetQuery<SinglePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"SELECT [Users].[Id], [Users].[Username], [Users].[Password] FROM [Users] WHERE [Users].[Id] = @Id", selectQuery);
+			Assert.Equal($"SELECT [dbo].[Users].[Id], [dbo].[Users].[Username], [dbo].[Users].[Password] FROM [dbo].[Users] WHERE [dbo].[Users].[Id] = @Id", selectQuery);
 		}
 
 		[Fact]
@@ -195,7 +195,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var selectQuery = generator.GenerateGetQuery<CompositePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"SELECT [Users].[Username], [Users].[Password], [Users].[DateCreated] FROM [Users] WHERE [Users].[Username] = @Username AND [Users].[Password] = @Password", selectQuery);
+			Assert.Equal($"SELECT [dbo].[Users].[Username], [dbo].[Users].[Password], [dbo].[Users].[DateCreated] FROM [dbo].[Users] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", selectQuery);
 		}
 
 		[Fact]
@@ -208,7 +208,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var selectQuery = generator.GenerateGetQuery<CustomColumnNamesRecord>();
 
 			// Assert
-			Assert.Equal($"SELECT [Orders].[OrderId] AS [Id], [Orders].[DateCreated] AS [Date] FROM [Orders] WHERE [Orders].[OrderId] = @Id", selectQuery);
+			Assert.Equal($"SELECT [dbo].[Orders].[OrderId] AS [Id], [dbo].[Orders].[DateCreated] AS [Date] FROM [dbo].[Orders] WHERE [dbo].[Orders].[OrderId] = @Id", selectQuery);
 		}
 
 		[Fact]
@@ -234,7 +234,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var updateQuery = generator.GenerateUpdateQuery<SinglePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"UPDATE [Users] SET [Users].[Username] = @Username, [Users].[Password] = @Password OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] WHERE [Users].[Id] = @Id", updateQuery);
+			Assert.Equal($"UPDATE [dbo].[Users] SET [dbo].[Users].[Username] = @Username, [dbo].[Users].[Password] = @Password OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] WHERE [dbo].[Users].[Id] = @Id", updateQuery);
 		}
 
 		[Fact]
@@ -247,7 +247,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var updateQuery = generator.GenerateUpdateQuery<CompositePrimaryKeyRecord>();
 
 			// Assert
-			Assert.Equal($"UPDATE [Users] SET [Users].[DateCreated] = @DateCreated OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] WHERE [Users].[Username] = @Username AND [Users].[Password] = @Password", updateQuery);
+			Assert.Equal($"UPDATE [dbo].[Users] SET [dbo].[Users].[DateCreated] = @DateCreated OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", updateQuery);
 		}
 
 		[Fact]
@@ -260,7 +260,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var updateQuery = generator.GenerateUpdateQuery<CustomColumnNamesRecord>();
 
 			// Assert
-			Assert.Equal($"UPDATE [Orders] SET [Orders].[DateCreated] = @Date OUTPUT [inserted].[OrderId] AS [Id], [inserted].[DateCreated] AS [Date] WHERE [Orders].[OrderId] = @Id", updateQuery);
+			Assert.Equal($"UPDATE [dbo].[Orders] SET [dbo].[Orders].[DateCreated] = @Date OUTPUT [inserted].[OrderId] AS [Id], [inserted].[DateCreated] AS [Date] WHERE [dbo].[Orders].[OrderId] = @Id", updateQuery);
 		}
 
 		[Fact]
@@ -271,6 +271,19 @@ namespace Ckode.Dapper.Repository.Tests
 
 			// Act && Assert
 			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<Heap>());
+		}
+
+		[Fact]
+		public void GenerateDeleteQuery_CustomSchema_Valid()
+		{
+			// Arrange
+			var generator = new SQLGenerator("Users", "account");
+
+			// Act
+			var query = generator.GenerateDeleteQuery<SinglePrimaryKeyRecord>();
+
+			// Assert
+			Assert.Equal("DELETE FROM [account].[Users] OUTPUT [deleted].[Id], [deleted].[Username], [deleted].[Password] WHERE [account].[Users].[Id] = @Id", query);
 		}
 		#endregion
 	}
