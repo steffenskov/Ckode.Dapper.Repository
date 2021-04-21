@@ -1,4 +1,6 @@
-Schema support på repo / sql generator
+Support for default constraints:
+- Hvordan håndteres f.eks. DateCreated, idet recorden jo sendes med ind i queries? Skal den evt. markeres somehow?
+
 Async repo
 Aggregate repo
 Heap repo
