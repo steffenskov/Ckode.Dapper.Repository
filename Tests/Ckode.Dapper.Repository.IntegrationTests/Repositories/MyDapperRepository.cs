@@ -4,19 +4,19 @@ using SqlMapper = Dapper.SqlMapper;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
-    public abstract class MyDapperRepository<TPrimaryKeyRecord, TRecord> : DapperSQLRepository<TPrimaryKeyRecord, TRecord>
-        where TPrimaryKeyRecord : TableRecord
-        where TRecord : TPrimaryKeyRecord
-    {
-        private const string _connectionString = @"Server=localhost;Database=Northwind;User Id=sa;Password=SqlServer2019;";
+	public abstract class MyDapperRepository<TPrimaryKeyRecord, TRecord> : DapperSQLRepository<TPrimaryKeyRecord, TRecord>
+		where TPrimaryKeyRecord : TableRecord
+		where TRecord : TPrimaryKeyRecord
+	{
+		private const string _connectionString = @"Server=localhost;Database=Northwind;User Id=sa;Password=SqlServer2019;";
 
-        protected override QuerySingleDelegate<TRecord> QuerySingle => SqlMapper.QuerySingle<TRecord>;
-        protected override QuerySingleDelegate<TRecord> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TRecord>;
-        protected override QueryDelegate<TRecord> Query => SqlMapper.Query<TRecord>;
+		protected override QuerySingleDelegate<TRecord> QuerySingle => SqlMapper.QuerySingle<TRecord>;
+		protected override QuerySingleDelegate<TRecord> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TRecord>;
+		protected override QueryDelegate<TRecord> Query => SqlMapper.Query<TRecord>;
 
-        protected override IDbConnection CreateConnection()
-        {
-            return new SqlConnection(_connectionString);
-        }
-    }
+		protected override IDbConnection CreateConnection()
+		{
+			return new SqlConnection(_connectionString);
+		}
+	}
 }
