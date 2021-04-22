@@ -1,24 +1,39 @@
 using System;
+using Ckode.Dapper.Repository.Sql;
 using Ckode.Dapper.Repository.Tests.Records;
 using Xunit;
 
-namespace Ckode.Dapper.Repository.Tests
+namespace Ckode.Dapper.Repository.Tests.Sql
 {
-	public class SQLGeneratorTests
+	public class QueryGeneratorTests
 	{
 		#region Constructor
 		[Fact]
-		public void Constructor_InputIsNull_Throws()
+		public void Constructor_TableNameIsNull_Throws()
 		{
 			// Arrange, act && assert
-			Assert.Throws<ArgumentNullException>(() => new SQLGenerator(null!));
+			Assert.Throws<ArgumentNullException>(() => new QueryGenerator(null!, "dbo"));
 		}
 
 		[Fact]
-		public void Constructor_InputIsWhitespace_Throws()
+		public void Constructor_SchemaIsNull_Throws()
 		{
 			// Arrange, act && assert
-			Assert.Throws<ArgumentException>(() => new SQLGenerator(" "));
+			Assert.Throws<ArgumentNullException>(() => new QueryGenerator("Users", null!));
+		}
+
+		[Fact]
+		public void Constructor_TableNameIsWhitespace_Throws()
+		{
+			// Arrange, act && assert
+			Assert.Throws<ArgumentException>(() => new QueryGenerator(" ", "dbo"));
+		}
+
+		[Fact]
+		public void Constructor_SchemaIsWhitespace_Throws()
+		{
+			// Arrange, act && assert
+			Assert.Throws<ArgumentException>(() => new QueryGenerator("Users", " "));
 		}
 		#endregion
 
@@ -27,7 +42,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateDeleteQuery_OnePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var deleteQuery = generator.GenerateDeleteQuery<SinglePrimaryKeyRecord>();
@@ -40,7 +55,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateDeleteQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var deleteQuery = generator.GenerateDeleteQuery<CompositePrimaryKeyRecord>();
@@ -53,7 +68,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateDeleteQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Orders");
+			var generator = new QueryGenerator("Orders", "dbo");
 
 			// Act
 			var deleteQuery = generator.GenerateDeleteQuery<CustomColumnNamesRecord>();
@@ -66,7 +81,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateDeleteQuery_NoPrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var deleteQuery = generator.GenerateDeleteQuery<Heap>();
@@ -81,7 +96,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_IdentityValuePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new SinglePrimaryKeyRecord());
@@ -94,7 +109,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_MissingColumnValue_ContainsColumn()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new CompositePrimaryKeyRecord());
@@ -107,7 +122,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new CompositePrimaryKeyRecord());
@@ -120,7 +135,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Orders");
+			var generator = new QueryGenerator("Orders", "dbo");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new CustomColumnNamesRecord());
@@ -133,7 +148,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_NoPrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new Heap());
@@ -148,7 +163,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateGetAllQuery_ProperTableName_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var selectQuery = generator.GenerateGetAllQuery<Heap>();
@@ -161,7 +176,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateGetAllQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Orders");
+			var generator = new QueryGenerator("Orders", "dbo");
 
 			// Act
 			var selectQuery = generator.GenerateGetAllQuery<CustomColumnNamesRecord>();
@@ -176,7 +191,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateGetQuery_SinglePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var selectQuery = generator.GenerateGetQuery<SinglePrimaryKeyRecord>();
@@ -189,7 +204,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateGetQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var selectQuery = generator.GenerateGetQuery<CompositePrimaryKeyRecord>();
@@ -202,7 +217,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateGetQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Orders");
+			var generator = new QueryGenerator("Orders", "dbo");
 
 			// Act
 			var selectQuery = generator.GenerateGetQuery<CustomColumnNamesRecord>();
@@ -212,13 +227,16 @@ namespace Ckode.Dapper.Repository.Tests
 		}
 
 		[Fact]
-		public void GenerateGetQuery_NoPrimaryKey_Throws()
+		public void GenerateGetQuery_NoPrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
-			// Act && Assert
-			Assert.Throws<InvalidOperationException>(() => generator.GenerateGetQuery<Heap>());
+			// Act
+			var query = generator.GenerateGetQuery<Heap>();
+
+			// Assert
+			Assert.Equal("SELECT [dbo].[Users].[Username], [dbo].[Users].[Password] FROM [dbo].[Users] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", query);
 		}
 		#endregion
 
@@ -228,7 +246,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateUpdateQuery_SinglePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act 
 			var updateQuery = generator.GenerateUpdateQuery<SinglePrimaryKeyRecord>();
@@ -241,7 +259,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateUpdateQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act 
 			var updateQuery = generator.GenerateUpdateQuery<CompositePrimaryKeyRecord>();
@@ -254,7 +272,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateUpdateQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Orders");
+			var generator = new QueryGenerator("Orders", "dbo");
 
 			// Act 
 			var updateQuery = generator.GenerateUpdateQuery<CustomColumnNamesRecord>();
@@ -267,7 +285,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateUpdateQuery_NoPrimaryKey_Throws()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act && Assert
 			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<Heap>());
@@ -277,7 +295,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateUpdateQuery_AllColumnsHasNoSetter_Throws()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act && Assert
 			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<AllColumnsHasMissingSetterRecord>());
@@ -287,7 +305,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateUpdateQuery_ColumnHasNoSetter_ColumnIsExcluded()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
 			var query = generator.GenerateUpdateQuery<ColumnHasMissingSetterRecord>();
@@ -300,7 +318,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateDeleteQuery_CustomSchema_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users", "account");
+			var generator = new QueryGenerator("Users", "account");
 
 			// Act
 			var query = generator.GenerateDeleteQuery<SinglePrimaryKeyRecord>();
@@ -313,7 +331,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_CustomSchema_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users", "account");
+			var generator = new QueryGenerator("Users", "account");
 
 			// Act
 			var query = generator.GenerateInsertQuery(new SinglePrimaryKeyRecord());
@@ -326,7 +344,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndDefaultValue_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 
 			// Actj
 			var query = generator.GenerateInsertQuery(new HasDefaultConstraintRecord());
@@ -339,7 +357,7 @@ namespace Ckode.Dapper.Repository.Tests
 		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndNonDefaultValue_Valid()
 		{
 			// Arrange
-			var generator = new SQLGenerator("Users");
+			var generator = new QueryGenerator("Users", "dbo");
 			var record = new HasDefaultConstraintRecord
 			{
 				Id = 42,

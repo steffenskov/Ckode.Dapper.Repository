@@ -1,13 +1,9 @@
 Async repo
 Aggregate repo inkl. FK usage
-Heap repo
+
 
 evt. "GetMany<TRecord, TArgument>(TArgument arg)" og GetSingle ditto, 
 Tilføj også Scalar<TArgument, TResult>(TArgument arg) samt non-query ditto.
 
 hvor reflection bruges på TArgument til at finde samtlige properties og mappe dem op til kendte columnName/PropertyNames på TRecord.
 Mangler noget kan den kaste ArgumentException.
-
-
-
-HeapRepository<TRecord> : BaseRepository<TRecord, TRecord> løser PK issue uden at skrive kode

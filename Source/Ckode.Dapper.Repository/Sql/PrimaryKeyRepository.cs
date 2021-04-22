@@ -2,31 +2,29 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Ckode.Dapper.Repository.Interfaces;
 using Ckode.Dapper.Repository.MetaInformation;
-using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
-namespace Ckode.Dapper.Repository
+namespace Ckode.Dapper.Repository.Sql
 {
-	public abstract class DapperSQLRepository<TPrimaryKeyRecord, TRecord> : IRepository<TPrimaryKeyRecord, TRecord>
+	public abstract class PrimaryKeyRepository<TPrimaryKeyRecord, TRecord> : IRepository<TPrimaryKeyRecord, TRecord>
 		where TPrimaryKeyRecord : TableRecord
 		where TRecord : TPrimaryKeyRecord
 	{
-		#region Dapper delegates
+		private readonly QueryGenerator _queryGenerator;
+		private readonly QueryResultChecker<TPrimaryKeyRecord, TRecord> _resultChecker;
 
-		protected delegate T QuerySingleDelegate<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
-		protected delegate IEnumerable<T> QueryDelegate<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null);
-		#endregion
-
-		private readonly SQLGenerator generator;
-
-		public DapperSQLRepository()
+		public PrimaryKeyRepository()
 		{
-			generator = new SQLGenerator(TableName);
+			_queryGenerator = new QueryGenerator(TableName, Schema);
+			_resultChecker = new QueryResultChecker<TPrimaryKeyRecord, TRecord>();
 		}
 
 		protected abstract string TableName { get; }
 
-		protected virtual string Schema => "dbo";
+		protected string Schema => "dbo";
+
+		protected string FormattedTableName => $"[{Schema}].[{TableName}]";
 
 		protected abstract IDbConnection CreateConnection();
 
@@ -51,10 +49,10 @@ namespace Ckode.Dapper.Repository
 
 			CheckForDefaultPrimaryKeys(info, record);
 
-			var query = generator.GenerateDeleteQuery<TRecord>();
-			var result = ExecuteQueryOrDefault(record, query);
+			var query = _queryGenerator.GenerateDeleteQuery<TRecord>();
+			var result = ExecuteQuerySingleOrDefault(record, query);
 
-			return ReturnOrThrowIfRecordIsNull(record, info, result, query);
+			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result, query);
 		}
 
 		public TRecord Get(TPrimaryKeyRecord record)
@@ -68,14 +66,14 @@ namespace Ckode.Dapper.Repository
 
 			CheckForDefaultPrimaryKeys(info, record);
 
-			var query = generator.GenerateGetQuery<TRecord>();
-			var result = ExecuteQueryOrDefault(record, query);
+			var query = _queryGenerator.GenerateGetQuery<TRecord>();
+			var result = ExecuteQuerySingleOrDefault(record, query);
 
-			return ReturnOrThrowIfRecordIsNull(record, info, result, query);
+			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result, query);
 		}
 		public IEnumerable<TRecord> GetAll()
 		{
-			var query = generator.GenerateGetAllQuery<TRecord>();
+			var query = _queryGenerator.GenerateGetAllQuery<TRecord>();
 			using var connection = CreateConnection();
 			return Query.Invoke(connection, query);
 		}
@@ -98,7 +96,7 @@ namespace Ckode.Dapper.Repository
 				throw new ArgumentException($"record has the following primary keys marked with IsIdentity, which have non-default values: {string.Join(", ", invalidIdentityColumns.Select(col => col.Name))}", nameof(record));
 			}
 
-			var query = generator.GenerateInsertQuery(record);
+			var query = _queryGenerator.GenerateInsertQuery(record);
 			using var connection = CreateConnection();
 			return QuerySingle.Invoke(connection, query, record);
 		}
@@ -114,10 +112,10 @@ namespace Ckode.Dapper.Repository
 
 			CheckForDefaultPrimaryKeys(info, record);
 
-			var query = generator.GenerateUpdateQuery<TRecord>();
-			var result = ExecuteQueryOrDefault(record, query);
+			var query = _queryGenerator.GenerateUpdateQuery<TRecord>();
+			var result = ExecuteQuerySingleOrDefault(record, query);
 
-			return ReturnOrThrowIfRecordIsNull(record, info, result, query);
+			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result, query);
 		}
 
 
@@ -133,35 +131,10 @@ namespace Ckode.Dapper.Repository
 			}
 		}
 
-		private static TRecord ReturnOrThrowIfRecordIsNull(TPrimaryKeyRecord record, RecordInformation info, TRecord? result, string query)
-		{
-			if (result == null)
-			{
-				var formattedPrimaryKeys = PrintPrimaryKeys(info.PrimaryKeys, record);
-				throw new NoRecordFoundException(query, formattedPrimaryKeys, $"No matching record found with the given primary keys.");
-			}
-			return result;
-		}
-
-		private TRecord? ExecuteQueryOrDefault(TPrimaryKeyRecord record, string query)
+		private TRecord? ExecuteQuerySingleOrDefault(TPrimaryKeyRecord record, string query)
 		{
 			using var connection = CreateConnection();
 			return QuerySingleOrDefault.Invoke(connection, query, record);
-		}
-
-
-		private static string PrintPrimaryKeys(IReadOnlyCollection<PrimaryKeyPropertyInfo> primaryKeys, TPrimaryKeyRecord record)
-		{
-			return string.Join(Environment.NewLine, primaryKeys.Select(pk => $"{pk.Name} = {FormatPrimaryKeyValue(pk, record)}"));
-		}
-
-		private static string FormatPrimaryKeyValue(PrimaryKeyPropertyInfo primaryKey, TPrimaryKeyRecord record)
-		{
-			var valueAsString = primaryKey.GetValue(record)?.ToString() ?? "null";
-			if (primaryKey.Type == typeof(string))
-				return $@"""{valueAsString}""";
-			else
-				return valueAsString;
 		}
 	}
 }

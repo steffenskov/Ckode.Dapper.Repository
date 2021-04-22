@@ -16,4 +16,5 @@ ARG NORTHWIND_SQL="/usr/share/instnwnd.sql"
 RUN wget "${NORTHWIND_SQL_GITHUB}" -O "${NORTHWIND_SQL}"
 RUN (/opt/mssql/bin/sqlservr --accept-eula & ) \
 	&& (/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "SqlServer2019" -i /usr/share/instnwnd.sql) \
-	&& (/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "SqlServer2019" -q "use Northwind; CREATE TABLE CompositeUsers ( Username VARCHAR(50) NOT NULL, Password VARCHAR(50) NOT NULL, Age INT NULL, DateCreated DATETIME NOT NULL DEFAULT(GETDATE()) ); ALTER TABLE CompositeUsers ADD CONSTRAINT PK_CompositeUsers PRIMARY KEY (Username, Password);")
+	&& (/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "SqlServer2019" -q "use Northwind; CREATE TABLE CompositeUsers ( Username VARCHAR(50) NOT NULL, Password VARCHAR(50) NOT NULL, Age INT NULL, DateCreated DATETIME NOT NULL DEFAULT(GETDATE()) ); ALTER TABLE CompositeUsers ADD CONSTRAINT PK_CompositeUsers PRIMARY KEY (Username, Password);") \
+	&& (/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "SqlServer2019" -q "use Northwind; CREATE TABLE Heaps (Username VARCHAR(50) NOT NULL, Password VARCHAR(50) NOT NULL);")

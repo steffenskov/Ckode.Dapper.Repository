@@ -6,13 +6,13 @@ using Ckode.Dapper.Repository.MetaInformation;
 using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
 [assembly: InternalsVisibleTo("Ckode.Dapper.Repository.UnitTests")]
-namespace Ckode.Dapper.Repository
+namespace Ckode.Dapper.Repository.Sql
 {
-	internal class SQLGenerator
+	internal class QueryGenerator
 	{
 		private readonly string _schemaAndTable;
 
-		public SQLGenerator(string tableName, string schema = "dbo")
+		public QueryGenerator(string tableName, string schema)
 		{
 			if (tableName == null)
 			{
@@ -27,6 +27,11 @@ namespace Ckode.Dapper.Repository
 			if (string.IsNullOrWhiteSpace(tableName))
 			{
 				throw new ArgumentException($"Invalid tableName: {tableName}", nameof(tableName));
+			}
+
+			if (string.IsNullOrWhiteSpace(schema))
+			{
+				throw new ArgumentException($"Invalid schema: {schema}", nameof(schema));
 			}
 			_schemaAndTable = $"{EnsureSquareBrackets(schema)}.{EnsureSquareBrackets(tableName)}";
 		}
@@ -70,14 +75,13 @@ namespace Ckode.Dapper.Repository
 			where TRecord : TableRecord
 		{
 			var info = RecordInformationCache.GetRecordInformation<TRecord>();
-			if (!info.PrimaryKeys.Any())
-			{
-				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
-			}
+			var whereClause = info.PrimaryKeys.Count == 0
+										? GenerateWhereClauseWithoutPrimaryKey(info)
+										: GenerateWhereClauseWithPrimaryKeys(info);
 
 			var columnsList = GenerateColumnsList(_schemaAndTable, info.Columns);
 
-			return $"SELECT {columnsList} FROM {_schemaAndTable} WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
+			return $"SELECT {columnsList} FROM {_schemaAndTable} WHERE {whereClause}";
 		}
 
 		public string GenerateUpdateQuery<TRecord>()
