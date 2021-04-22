@@ -64,9 +64,16 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var insertedRecord = repository.Insert(record);
 
 			// Assert
-			Assert.Equal(record.Username, insertedRecord.Username);
-			Assert.Equal(record.Password, insertedRecord.Password);
-			Assert.True(insertedRecord.DateCreated > DateTime.Now.AddHours(-1));
+			try
+			{
+				Assert.Equal(record.Username, insertedRecord.Username);
+				Assert.Equal(record.Password, insertedRecord.Password);
+				Assert.True(insertedRecord.DateCreated > DateTime.UtcNow.AddHours(-1));
+			}
+			finally
+			{
+				repository.Delete(record);
+			}
 		}
 	}
 }

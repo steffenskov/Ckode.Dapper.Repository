@@ -2,7 +2,7 @@ Support for default constraints:
 - Hvordan håndteres f.eks. DateCreated, idet recorden jo sendes med ind i queries? Skal den evt. markeres somehow?
 
 Async repo
-Aggregate repo
+Aggregate repo inkl. FK usage
 Heap repo
 
 evt. "GetMany<TRecord, TArgument>(TArgument arg)" og GetSingle ditto, 

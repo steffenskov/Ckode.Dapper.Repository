@@ -84,7 +84,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var generator = new SQLGenerator("Users");
 
 			// Act
-			var insertQuery = generator.GenerateInsertQuery<SinglePrimaryKeyRecord>();
+			var insertQuery = generator.GenerateInsertQuery(new SinglePrimaryKeyRecord());
 
 			// Assert
 			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password]) OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
@@ -97,7 +97,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var generator = new SQLGenerator("Users");
 
 			// Act
-			var insertQuery = generator.GenerateInsertQuery<CompositePrimaryKeyRecord>();
+			var insertQuery = generator.GenerateInsertQuery(new CompositePrimaryKeyRecord());
 
 			// Assert
 			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password], [DateCreated]) OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] VALUES (@Username, @Password, @DateCreated)", insertQuery);
@@ -110,7 +110,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var generator = new SQLGenerator("Users");
 
 			// Act
-			var insertQuery = generator.GenerateInsertQuery<CompositePrimaryKeyRecord>();
+			var insertQuery = generator.GenerateInsertQuery(new CompositePrimaryKeyRecord());
 
 			// Assert
 			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password], [DateCreated]) OUTPUT [inserted].[Username], [inserted].[Password], [inserted].[DateCreated] VALUES (@Username, @Password, @DateCreated)", insertQuery);
@@ -123,7 +123,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var generator = new SQLGenerator("Orders");
 
 			// Act
-			var insertQuery = generator.GenerateInsertQuery<CustomColumnNamesRecord>();
+			var insertQuery = generator.GenerateInsertQuery(new CustomColumnNamesRecord());
 
 			// Assert
 			Assert.Equal($"INSERT INTO [dbo].[Orders] ([DateCreated]) OUTPUT [inserted].[OrderId] AS [Id], [inserted].[DateCreated] AS [Date] VALUES (@Date)", insertQuery);
@@ -136,7 +136,7 @@ namespace Ckode.Dapper.Repository.Tests
 			var generator = new SQLGenerator("Users");
 
 			// Act
-			var insertQuery = generator.GenerateInsertQuery<Heap>();
+			var insertQuery = generator.GenerateInsertQuery(new Heap());
 
 			// Assert
 			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password]) OUTPUT [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
@@ -284,6 +284,50 @@ namespace Ckode.Dapper.Repository.Tests
 
 			// Assert
 			Assert.Equal("DELETE FROM [account].[Users] OUTPUT [deleted].[Id], [deleted].[Username], [deleted].[Password] WHERE [account].[Users].[Id] = @Id", query);
+		}
+
+		[Fact]
+		public void GenerateInsertQuery_CustomSchema_Valid()
+		{
+			// Arrange
+			var generator = new SQLGenerator("Users", "account");
+
+			// Act
+			var query = generator.GenerateInsertQuery(new SinglePrimaryKeyRecord());
+
+			// Assert
+			Assert.Equal("INSERT INTO [account].[Users] ([Username], [Password]) OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", query);
+		}
+
+		[Fact]
+		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndDefaultValue_Valid()
+		{
+			// Arrange
+			var generator = new SQLGenerator("Users");
+
+			// Actj
+			var query = generator.GenerateInsertQuery(new HasDefaultConstraintRecord());
+
+			// Assert
+			Assert.Equal("INSERT INTO [dbo].[Users] ([Id]) OUTPUT [inserted].[Id], [inserted].[DateCreated] VALUES (@Id)", query);
+		}
+
+		[Fact]
+		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndNonDefaultValue_Valid()
+		{
+			// Arrange
+			var generator = new SQLGenerator("Users");
+			var record = new HasDefaultConstraintRecord
+			{
+				Id = 42,
+				DateCreated = DateTime.Now
+			};
+
+			// Act
+			var query = generator.GenerateInsertQuery(record);
+
+			// Assert
+			Assert.Equal("INSERT INTO [dbo].[Users] ([Id], [DateCreated]) OUTPUT [inserted].[Id], [inserted].[DateCreated] VALUES (@Id, @DateCreated)", query);
 		}
 		#endregion
 	}

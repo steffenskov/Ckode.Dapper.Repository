@@ -5,18 +5,16 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Records
 {
 	public record CompositeUserPrimaryKeyRecord : TableRecord
 	{
-		[PrimaryKey(isIdentity: false)]
-		[Column]
+		[PrimaryKeyColumn(isIdentity: false)]
 		public string Username { get; init; }
 
-		[PrimaryKey(isIdentity: false)]
-		[Column]
+		[PrimaryKeyColumn(isIdentity: false)]
 		public string Password { get; init; }
 	}
 
 	public record CompositeUserRecord : CompositeUserPrimaryKeyRecord
 	{
-		[Column]
+		[Column(hasDefaultConstraint: true)]
 		public DateTime DateCreated { get; init; }
 	}
 }

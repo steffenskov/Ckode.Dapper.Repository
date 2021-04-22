@@ -44,14 +44,14 @@ namespace Ckode.Dapper.Repository
 			return $"DELETE FROM {_schemaAndTable} OUTPUT {outputColumns} WHERE {whereClause}";
 		}
 
-		public string GenerateInsertQuery<TRecord>()
+		public string GenerateInsertQuery<TRecord>(TRecord record)
 			where TRecord : TableRecord
 		{
 			var info = RecordInformationCache.GetRecordInformation<TRecord>();
 			var identityColumns = info.PrimaryKeys.Where(pk => pk.IsIdentity).Select(pk => pk.Property).ToList();
 
 			var columnsToInsert = info.Columns
-										.Where(column => !identityColumns.Contains(column.Property))
+										.Where(column => !identityColumns.Contains(column.Property) && (!column.HasDefaultConstraint || !column.HasDefaultValue(record)))
 										.ToList();
 
 			var outputColumns = GenerateColumnsList("inserted", info.Columns);
@@ -72,7 +72,7 @@ namespace Ckode.Dapper.Repository
 			var info = RecordInformationCache.GetRecordInformation<TRecord>();
 			if (!info.PrimaryKeys.Any())
 			{
-				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKey].");
+				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
 			}
 
 			var columnsList = GenerateColumnsList(_schemaAndTable, info.Columns);
@@ -86,7 +86,7 @@ namespace Ckode.Dapper.Repository
 			var info = RecordInformationCache.GetRecordInformation<TRecord>();
 			if (!info.PrimaryKeys.Any())
 			{
-				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKey].");
+				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
 			}
 
 			var setClause = GenerateSetClause(info);

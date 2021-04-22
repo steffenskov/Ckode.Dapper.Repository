@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
+namespace Ckode.Dapper.Repository.MetaInformation
 {
 	public class MemberAccessor
 	{

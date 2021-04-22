@@ -98,7 +98,7 @@ namespace Ckode.Dapper.Repository
 				throw new ArgumentException($"record has the following primary keys marked with IsIdentity, which have non-default values: {string.Join(", ", invalidIdentityColumns.Select(col => col.Name))}", nameof(record));
 			}
 
-			var query = generator.GenerateInsertQuery<TRecord>();
+			var query = generator.GenerateInsertQuery(record);
 			using var connection = CreateConnection();
 			return QuerySingle.Invoke(connection, query, record);
 		}
