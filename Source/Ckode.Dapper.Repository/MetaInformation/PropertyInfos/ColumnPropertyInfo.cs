@@ -12,6 +12,9 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 		public PropertyInfo Property { get; }
 		public string Name => Property.Name;
 		public Type Type => Property.PropertyType;
+
+		public bool HasSetter { get; }
+
 		private readonly object? _defaultValue;
 		private readonly MemberAccessor _accessor;
 
@@ -23,6 +26,7 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 			HasDefaultConstraint = column.HasDefaultConstraint;
 
 			var type = property.PropertyType;
+
 			_accessor = new MemberAccessor(property);
 			if (type.IsValueType)
 			{
@@ -32,6 +36,7 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 			{
 				_defaultValue = null;
 			}
+			HasSetter = _accessor.HasSetter;
 		}
 
 		public bool HasDefaultValue<T>(T record) where T : TableRecord

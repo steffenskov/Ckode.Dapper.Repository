@@ -274,6 +274,29 @@ namespace Ckode.Dapper.Repository.Tests
 		}
 
 		[Fact]
+		public void GenerateUpdateQuery_AllColumnsHasNoSetter_Throws()
+		{
+			// Arrange
+			var generator = new SQLGenerator("Users");
+
+			// Act && Assert
+			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<AllColumnsHasMissingSetterRecord>());
+		}
+
+		[Fact]
+		public void GenerateUpdateQuery_ColumnHasNoSetter_ColumnIsExcluded()
+		{
+			// Arrange
+			var generator = new SQLGenerator("Users");
+
+			// Act
+			var query = generator.GenerateUpdateQuery<ColumnHasMissingSetterRecord>();
+
+			// Assert
+			Assert.Equal("UPDATE [dbo].[Users] SET [dbo].[Users].[Age] = @Age OUTPUT [inserted].[Id], [inserted].[Age], [inserted].[DateCreated] WHERE [dbo].[Users].[Id] = @Id", query);
+		}
+
+		[Fact]
 		public void GenerateDeleteQuery_CustomSchema_Valid()
 		{
 			// Arrange

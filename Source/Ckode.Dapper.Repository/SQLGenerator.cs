@@ -91,16 +91,20 @@ namespace Ckode.Dapper.Repository
 
 			var setClause = GenerateSetClause(info);
 
+			if (string.IsNullOrEmpty(setClause))
+			{
+				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TRecord).FullName} failed as the type has no columns with a setter.");
+			}
+
 			var outputColumns = GenerateColumnsList("inserted", info.Columns);
 
 			return $"UPDATE {_schemaAndTable} SET {setClause} OUTPUT {outputColumns} WHERE {GenerateWhereClauseWithPrimaryKeys(info)}";
 		}
 
-
 		private string GenerateSetClause(RecordInformation info)
 		{
 			var primaryKeys = info.PrimaryKeys.Select(pk => pk.Property).ToList();
-			var columnsToSet = info.Columns.Where(column => !primaryKeys.Contains(column.Property));
+			var columnsToSet = info.Columns.Where(column => !primaryKeys.Contains(column.Property) && column.HasSetter);
 			return string.Join(", ", columnsToSet.Select(column => $"{_schemaAndTable}.{AddSquareBrackets(column.ColumnName)} = @{column.Name}"));
 		}
 

@@ -18,6 +18,9 @@ namespace Ckode.Dapper.Repository.MetaInformation
 		internal readonly Func<object, object> getter;
 		internal readonly Action<object, object> setter;
 
+		public bool HasGetter => getter != NoGetter;
+		public bool HasSetter => setter != NoSetter;
+
 		public MemberAccessor(PropertyInfo property)
 		{
 			if (property == null)

@@ -7,7 +7,6 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 {
 	public class CompositePrimaryKeyTests
 	{
-
 		[Fact]
 		public void Delete_PrimaryKeyPartiallyNotEntered_Throws()
 		{
@@ -35,13 +34,13 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var repository = new CompositeUserRepository();
 			var record = new CompositeUserRecord
 			{
-				Username = "My name",
+				Username = "My name1",
 				Password = "Secret"
 			};
 			var insertedRecord = repository.Insert(record);
 
 			// Act
-			var deleted = repository.Delete(new CompositeUserPrimaryKeyRecord { Username = "My name", Password = "Secret" });
+			var deleted = repository.Delete(new CompositeUserPrimaryKeyRecord { Username = "My name1", Password = "Secret" });
 
 			// Assert
 			Assert.Equal(record.Username, deleted.Username);
@@ -50,30 +49,91 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		}
 
 		[Fact]
-		public void Insert_RelyOnDefaultConstraint_Valid()
+		public void Get_PrimaryKeyPartiallyNotEntered_Throws()
+		{
+			// Arrange
+			var repository = new CompositeUserRepository();
+
+			// Act && Assert
+			Assert.Throws<ArgumentException>(() => repository.Get(new CompositeUserPrimaryKeyRecord { Username = "My name" }));
+		}
+
+		[Fact]
+		public void Get_UseMissingPrimaryKeyValue_Throws()
+		{
+			// Arrange
+			var repository = new CompositeUserRepository();
+
+			// Act && Assert
+			Assert.Throws<NoRecordFoundException>(() => repository.Get(new CompositeUserPrimaryKeyRecord { Username = "My name", Password = "Secret" }));
+		}
+
+		[Fact]
+		public void Get_UsePrimaryKey_Valid()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 			var record = new CompositeUserRecord
 			{
-				Username = "My name",
+				Username = "My name2",
 				Password = "Secret"
 			};
-
-			// Act
 			var insertedRecord = repository.Insert(record);
 
+			// Act
+			var gotten = repository.Get(new CompositeUserPrimaryKeyRecord { Username = "My name2", Password = "Secret" });
+
 			// Assert
-			try
+			Assert.Equal(record.Username, gotten.Username);
+			Assert.Equal(record.Password, gotten.Password);
+			Assert.Equal(insertedRecord.DateCreated, gotten.DateCreated);
+
+			repository.Delete(insertedRecord);
+		}
+
+		[Fact]
+		public void Update_PrimaryKeyPartiallyNotEntered_Throws()
+		{
+			// Arrange
+			var repository = new CompositeUserRepository();
+
+			// Act && Assert
+			Assert.Throws<ArgumentException>(() => repository.Update(new CompositeUserRecord { Username = "My name" }));
+		}
+
+		[Fact]
+		public void Update_UseMissingPrimaryKeyValue_Throws()
+		{
+			// Arrange
+			var repository = new CompositeUserRepository();
+
+			// Act && Assert
+			Assert.Throws<NoRecordFoundException>(() => repository.Update(new CompositeUserRecord { Username = "Doesnt exist", Password = "Secret" }));
+		}
+
+		[Fact]
+		public void Update_UsePrimaryKey_Valid()
+		{
+			// Arrange
+			var repository = new CompositeUserRepository();
+			var record = new CompositeUserRecord
 			{
-				Assert.Equal(record.Username, insertedRecord.Username);
-				Assert.Equal(record.Password, insertedRecord.Password);
-				Assert.True(insertedRecord.DateCreated > DateTime.UtcNow.AddHours(-1));
-			}
-			finally
-			{
-				repository.Delete(record);
-			}
+				Username = "My name3",
+				Password = "Secret"
+			};
+			var insertedRecord = repository.Insert(record);
+
+			// Act
+			var updated = repository.Update(insertedRecord with { Age = 42 });
+
+			// Assert
+			Assert.Equal(record.Username, updated.Username);
+			Assert.Equal(record.Password, updated.Password);
+			Assert.NotEqual(42, insertedRecord.Age);
+			Assert.Equal(42, updated.Age);
+			Assert.Equal(insertedRecord.DateCreated, updated.DateCreated);
+
+			repository.Delete(insertedRecord);
 		}
 	}
 }

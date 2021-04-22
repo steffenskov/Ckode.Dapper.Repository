@@ -15,6 +15,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Records
 	public record CompositeUserRecord : CompositeUserPrimaryKeyRecord
 	{
 		[Column(hasDefaultConstraint: true)]
-		public DateTime DateCreated { get; init; }
+		public DateTime DateCreated { get; } // No init; as I want this value to never be set by the user
+
+		[Column]
+		public int? Age { get; init; }
 	}
 }
