@@ -30,9 +30,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 		#region Injection points for Dapper methods
 
-		protected abstract QuerySingleDelegate<TRecord> QuerySingle { get; }
-
-		protected abstract QueryDelegate<TRecord> Query { get; }
+		protected abstract IDapperInjection<TRecord> DapperInjection { get; }
 
 		#endregion
 
@@ -47,7 +45,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 			var query = _queryGenerator.GenerateDeleteQuery<TRecord>();
 			using var connection = CreateConnection();
-			var result = Query.Invoke(connection, query, record);
+			var result = DapperInjection.Query.Invoke(connection, query, record);
 
 			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result.FirstOrDefault(), query);
 		}
@@ -63,7 +61,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 			var query = _queryGenerator.GenerateGetQuery<TRecord>();
 			using var connection = CreateConnection();
-			var result = Query.Invoke(connection, query, record);
+			var result = DapperInjection.Query.Invoke(connection, query, record);
 
 			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result.FirstOrDefault(), query);
 		}
@@ -72,7 +70,7 @@ namespace Ckode.Dapper.Repository.Sql
 		{
 			var query = _queryGenerator.GenerateGetAllQuery<TRecord>();
 			using var connection = CreateConnection();
-			return Query.Invoke(connection, query);
+			return DapperInjection.Query.Invoke(connection, query);
 		}
 
 		public TRecord Insert(TRecord record)
@@ -84,7 +82,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 			var query = _queryGenerator.GenerateInsertQuery(record);
 			using var connection = CreateConnection();
-			return QuerySingle.Invoke(connection, query, record);
+			return DapperInjection.QuerySingle.Invoke(connection, query, record);
 		}
 	}
 }
