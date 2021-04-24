@@ -7,37 +7,37 @@ using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
 namespace Ckode.Dapper.Repository.MetaInformation
 {
-	internal static class RecordInformationCache
+	internal static class EntityInformationCache
 	{
-		private static readonly ConcurrentDictionary<Type, RecordInformation> _cache;
+		private static readonly ConcurrentDictionary<Type, EntityInformation> _cache;
 		private static readonly object _cacheLock = new object();
 
-		static RecordInformationCache()
+		static EntityInformationCache()
 		{
-			_cache = new ConcurrentDictionary<Type, RecordInformation>();
+			_cache = new ConcurrentDictionary<Type, EntityInformation>();
 		}
 
-		public static RecordInformation GetRecordInformation<TRecord>()
-			where TRecord : TableRecord
+		public static EntityInformation GetEntityInformation<TEntity>()
+			where TEntity : TableEntity
 		{
-			var type = typeof(TRecord);
+			var type = typeof(TEntity);
 			if (!_cache.TryGetValue(type, out var result))
 			{
 				lock (_cacheLock)
 				{
 					if (!_cache.TryGetValue(type, out result))
 					{
-						_cache[type] = result = CreateRecordInformation<TRecord>();
+						_cache[type] = result = CreateEntityInformation<TEntity>();
 					}
 				}
 			}
 			return result;
 		}
 
-		private static RecordInformation CreateRecordInformation<TRecord>()
-			where TRecord : TableRecord
+		private static EntityInformation CreateEntityInformation<TEntity>()
+			where TEntity : TableEntity
 		{
-			var properties = TypeCache.GetProperties<TRecord>();
+			var properties = TypeCache.GetProperties<TEntity>();
 			var primaryKeys = new List<PrimaryKeyPropertyInfo>();
 			var foreignKeys = new List<ForeignKeyPropertyInfo>();
 			var columns = new List<ColumnPropertyInfo>();
@@ -64,7 +64,7 @@ namespace Ckode.Dapper.Repository.MetaInformation
 				}
 			}
 
-			return new RecordInformation(primaryKeys.AsReadOnly(), foreignKeys.AsReadOnly(), columns.AsReadOnly());
+			return new EntityInformation(primaryKeys.AsReadOnly(), foreignKeys.AsReadOnly(), columns.AsReadOnly());
 		}
 	}
 }

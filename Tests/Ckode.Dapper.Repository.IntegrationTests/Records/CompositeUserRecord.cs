@@ -1,9 +1,9 @@
 using System;
 using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Records
+namespace Ckode.Dapper.Repository.IntegrationTests.Entitys
 {
-	public record CompositeUserPrimaryKeyRecord : TableRecord
+	public record CompositeUserPrimaryKeyEntity : TableEntity
 	{
 		[PrimaryKeyColumn(isIdentity: false)]
 		public string Username { get; init; }
@@ -12,7 +12,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Records
 		public string Password { get; init; }
 	}
 
-	public record CompositeUserRecord : CompositeUserPrimaryKeyRecord
+	public record CompositeUserEntity : CompositeUserPrimaryKeyEntity
 	{
 		[Column(hasDefaultConstraint: true)]
 		public DateTime DateCreated { get; } // No init; as I want this value to never be set by the user

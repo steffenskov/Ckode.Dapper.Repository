@@ -1,10 +1,10 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Records
+namespace Ckode.Dapper.Repository.Tests.Entitys
 {
-	public record SinglePrimaryKeyRecord : TableRecord
+	public record SinglePrimaryKeyEntity : TableEntity
 	{
-		public SinglePrimaryKeyRecord()
+		public SinglePrimaryKeyEntity()
 		{
 		}
 

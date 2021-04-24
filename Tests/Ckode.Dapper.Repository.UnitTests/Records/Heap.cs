@@ -1,13 +1,13 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Records
+namespace Ckode.Dapper.Repository.Tests.Entitys
 {
-    public record Heap : TableRecord
-    {
-        [Column]
-        public string Username { get; init; }
+	public record Heap : TableEntity
+	{
+		[Column]
+		public string Username { get; init; }
 
-        [Column]
-        public string Password { get; init; }
-    }
+		[Column]
+		public string Password { get; init; }
+	}
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using Ckode.Dapper.Repository.IntegrationTests.Records;
+using Ckode.Dapper.Repository.IntegrationTests.Entitys;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 
@@ -25,7 +25,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Hello world"
@@ -42,7 +42,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<NoRecordFoundException>(() => repository.Delete(new CategoryPrimaryKeyRecord { CategoryId = int.MaxValue }));
+			Assert.Throws<NoEntityFoundException>(() => repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
 		}
 
 		[Fact]
@@ -50,42 +50,42 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
 			// Act
-			var deleted = repository.Delete(new CategoryPrimaryKeyRecord { CategoryId = insertedRecord.CategoryId });
+			var deleted = repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
-			Assert.Equal(insertedRecord.CategoryId, deleted.CategoryId);
+			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
 			Assert.Equal(record.Description, deleted.Description);
 			Assert.Equal(record.Name, deleted.Name);
 			Assert.Equal(record.Picture, deleted.Picture);
 		}
 
 		[Fact]
-		public void Delete_UseRecord_Valid()
+		public void Delete_UseEntity_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
 			// Act
-			var deleted = repository.Delete(insertedRecord);
+			var deleted = repository.Delete(insertedEntity);
 
 			// Assert
-			Assert.Equal(insertedRecord.CategoryId, deleted.CategoryId);
+			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
 			Assert.Equal(record.Description, deleted.Description);
 			Assert.Equal(record.Name, deleted.Name);
 			Assert.Equal(record.Picture, deleted.Picture);
@@ -108,47 +108,47 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
 			// Act
-			var fetchedRecord = repository.Get(new CategoryPrimaryKeyRecord { CategoryId = insertedRecord.CategoryId });
+			var fetchedEntity = repository.Get(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
-			Assert.Equal(insertedRecord.Name, fetchedRecord.Name);
-			Assert.Equal(insertedRecord.Description, fetchedRecord.Description);
-			Assert.Equal(insertedRecord.Picture, fetchedRecord.Picture);
+			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
+			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
+			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
 
-			repository.Delete(insertedRecord);
+			repository.Delete(insertedEntity);
 		}
 
 		[Fact]
-		public void Get_UseFullRecord_Valid()
+		public void Get_UseFullEntity_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
 			// Act
-			var fetchedRecord = repository.Get(insertedRecord);
+			var fetchedEntity = repository.Get(insertedEntity);
 
 			// Assert
-			Assert.Equal(insertedRecord.Description, fetchedRecord.Description);
-			Assert.Equal(insertedRecord.Name, fetchedRecord.Name);
-			Assert.Equal(insertedRecord.Picture, fetchedRecord.Picture);
+			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
+			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
+			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
 
-			repository.Delete(insertedRecord);
+			repository.Delete(insertedEntity);
 		}
 
 		[Fact]
@@ -158,7 +158,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Get(new CategoryPrimaryKeyRecord { }));
+			Assert.Throws<ArgumentException>(() => repository.Get(new CategoryPrimaryKeyEntity { }));
 		}
 
 		[Fact]
@@ -168,7 +168,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<NoRecordFoundException>(() => repository.Get(new CategoryPrimaryKeyRecord { CategoryId = int.MaxValue }));
+			Assert.Throws<NoEntityFoundException>(() => repository.Get(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
 		}
 		#endregion
 
@@ -180,10 +180,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var repository = new CategoryRepository();
 
 			// Act
-			var fetchedRecords = repository.GetAll();
+			var fetchedEntitys = repository.GetAll();
 
 			// Assert
-			Assert.True(fetchedRecords.Count() > 0);
+			Assert.True(fetchedEntitys.Count() > 0);
 		}
 		#endregion
 
@@ -203,7 +203,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				CategoryId = 42,
 				Description = "Lorem ipsum, dolor sit amit",
@@ -220,7 +220,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Lorem ipsum",
@@ -228,18 +228,18 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 			try
 			{
 				// Assert
-				Assert.NotEqual(default, insertedRecord.CategoryId);
-				Assert.Equal(record.Description, insertedRecord.Description);
-				Assert.Equal(record.Name, insertedRecord.Name);
-				Assert.Equal(record.Picture, insertedRecord.Picture);
+				Assert.NotEqual(default, insertedEntity.CategoryId);
+				Assert.Equal(record.Description, insertedEntity.Description);
+				Assert.Equal(record.Name, insertedEntity.Name);
+				Assert.Equal(record.Picture, insertedEntity.Picture);
 			}
 			finally
 			{
-				repository.Delete(insertedRecord);
+				repository.Delete(insertedEntity);
 			}
 		}
 
@@ -248,7 +248,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = null!,
@@ -272,26 +272,26 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		}
 
 		[Fact]
-		public void Update_UseRecord_Valid()
+		public void Update_UseEntity_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Hello world"
 			};
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
-			var update = insertedRecord with { Description = "Something else" };
+			var update = insertedEntity with { Description = "Something else" };
 
 			// Act
-			var updatedRecord = repository.Update(update);
+			var updatedEntity = repository.Update(update);
 
 			// Assert
-			Assert.Equal("Something else", updatedRecord.Description);
+			Assert.Equal("Something else", updatedEntity.Description);
 
-			repository.Delete(insertedRecord);
+			repository.Delete(insertedEntity);
 		}
 
 		[Fact]
@@ -299,7 +299,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Hello world"
@@ -314,7 +314,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var record = new CategoryRecord
+			var record = new CategoryEntity
 			{
 				CategoryId = int.MaxValue,
 				Description = "Lorem ipsum, dolor sit amit",
@@ -322,7 +322,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act && Assert
-			Assert.Throws<NoRecordFoundException>(() => repository.Update(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Update(record));
 		}
 		#endregion
 	}

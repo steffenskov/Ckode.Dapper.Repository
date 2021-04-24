@@ -1,9 +1,9 @@
 ﻿using System;
 using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Records
+namespace Ckode.Dapper.Repository.Tests.Entitys
 {
-	internal record CompositePrimaryKeyRecord : TableRecord
+	internal record CompositePrimaryKeyEntity : TableEntity
 	{
 		[PrimaryKeyColumn]
 		public string Username { get; init; }

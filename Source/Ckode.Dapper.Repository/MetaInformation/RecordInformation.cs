@@ -3,7 +3,7 @@ using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
 namespace Ckode.Dapper.Repository.MetaInformation
 {
-	internal record RecordInformation(IReadOnlyCollection<PrimaryKeyPropertyInfo> PrimaryKeys, IReadOnlyCollection<ForeignKeyPropertyInfo> ForeignKeys, IReadOnlyCollection<ColumnPropertyInfo> Columns)
+	internal record EntityInformation(IReadOnlyCollection<PrimaryKeyPropertyInfo> PrimaryKeys, IReadOnlyCollection<ForeignKeyPropertyInfo> ForeignKeys, IReadOnlyCollection<ColumnPropertyInfo> Columns)
 	{
 	}
 }

@@ -1,9 +1,9 @@
 using System;
 using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Records
+namespace Ckode.Dapper.Repository.Tests.Entitys
 {
-	public record ColumnHasMissingSetterRecord : TableRecord
+	public record ColumnHasMissingSetterEntity : TableEntity
 	{
 		[PrimaryKeyColumn]
 		public int Id { get; init; }

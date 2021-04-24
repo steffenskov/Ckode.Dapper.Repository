@@ -3,23 +3,23 @@ using System.Threading.Tasks;
 
 namespace Ckode.Dapper.Repository.Interfaces
 {
-	public interface IRepository<TPrimaryKeyRecord, TRecord>
-		where TPrimaryKeyRecord : TableRecord
-		where TRecord : TPrimaryKeyRecord
+	public interface IRepository<TPrimaryKeyEntity, TEntity>
+		where TPrimaryKeyEntity : TableEntity
+		where TEntity : TPrimaryKeyEntity
 	{
-		TRecord Delete(TPrimaryKeyRecord record);
-		Task<TRecord> DeleteAsync(TPrimaryKeyRecord record);
+		TEntity Delete(TPrimaryKeyEntity record);
+		Task<TEntity> DeleteAsync(TPrimaryKeyEntity record);
 
-		TRecord Get(TPrimaryKeyRecord record);
-		Task<TRecord> GetAsync(TPrimaryKeyRecord record);
+		TEntity Get(TPrimaryKeyEntity record);
+		Task<TEntity> GetAsync(TPrimaryKeyEntity record);
 
-		IEnumerable<TRecord> GetAll();
-		Task<IEnumerable<TRecord>> GetAllAsync();
+		IEnumerable<TEntity> GetAll();
+		Task<IEnumerable<TEntity>> GetAllAsync();
 
-		TRecord Insert(TRecord record);
-		Task<TRecord> InsertAsync(TRecord record);
+		TEntity Insert(TEntity entity);
+		Task<TEntity> InsertAsync(TEntity entity);
 
-		TRecord Update(TRecord record);
-		Task<TRecord> UpdateAsync(TRecord record);
+		TEntity Update(TEntity entity);
+		Task<TEntity> UpdateAsync(TEntity entity);
 	}
 }

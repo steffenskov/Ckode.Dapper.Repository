@@ -8,17 +8,17 @@ using Ckode.Dapper.Repository.MetaInformation;
 
 namespace Ckode.Dapper.Repository.Sql
 {
-	public abstract class PrimaryKeyRepository<TPrimaryKeyRecord, TRecord> : IRepository<TPrimaryKeyRecord, TRecord>
-		where TPrimaryKeyRecord : TableRecord
-		where TRecord : TPrimaryKeyRecord
+	public abstract class PrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : IRepository<TPrimaryKeyEntity, TEntity>
+		where TPrimaryKeyEntity : TableEntity
+		where TEntity : TPrimaryKeyEntity
 	{
 		private readonly QueryGenerator _queryGenerator;
-		private readonly QueryResultChecker<TPrimaryKeyRecord, TRecord> _resultChecker;
+		private readonly QueryResultChecker<TPrimaryKeyEntity, TEntity> _resultChecker;
 
 		public PrimaryKeyRepository()
 		{
 			_queryGenerator = new QueryGenerator(TableName, Schema);
-			_resultChecker = new QueryResultChecker<TPrimaryKeyRecord, TRecord>();
+			_resultChecker = new QueryResultChecker<TPrimaryKeyEntity, TEntity>();
 		}
 
 		protected abstract string TableName { get; }
@@ -31,183 +31,183 @@ namespace Ckode.Dapper.Repository.Sql
 
 		#region Injection points for Dapper methods
 
-		protected abstract IDapperInjection<TRecord> DapperInjection { get; }
+		protected abstract IDapperInjection<TEntity> DapperInjection { get; }
 
 		#endregion
 
 		#region Delete
-		public TRecord Delete(TPrimaryKeyRecord record)
+		public TEntity Delete(TPrimaryKeyEntity entity)
 		{
-			return DeleteInternalAsync(record, (pk, query) => Task.FromResult(ExecuteQuerySingleOrDefault(pk, query)))
+			return DeleteInternalAsync(entity, (pk, query) => Task.FromResult(ExecuteQuerySingleOrDefault(pk, query)))
 					.GetAwaiter()
 					.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
 		}
 
-		public async Task<TRecord> DeleteAsync(TPrimaryKeyRecord record)
+		public async Task<TEntity> DeleteAsync(TPrimaryKeyEntity entity)
 		{
-			return await DeleteInternalAsync(record, async (pk, query) => await ExecuteQuerySingleOrDefaultAsync(pk, query));
+			return await DeleteInternalAsync(entity, async (pk, query) => await ExecuteQuerySingleOrDefaultAsync(pk, query));
 		}
 
-		private async Task<TRecord> DeleteInternalAsync(TPrimaryKeyRecord record, Func<TPrimaryKeyRecord, string, Task<TRecord?>> execute)
+		private async Task<TEntity> DeleteInternalAsync(TPrimaryKeyEntity entity, Func<TPrimaryKeyEntity, string, Task<TEntity?>> execute)
 		{
-			if (record == null)
+			if (entity == null)
 			{
-				throw new ArgumentNullException(nameof(record));
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			var info = RecordInformationCache.GetRecordInformation<TRecord>();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
-			CheckForDefaultPrimaryKeys(info, record);
+			CheckForDefaultPrimaryKeys(info, entity);
 
-			var query = _queryGenerator.GenerateDeleteQuery<TRecord>();
-			var result = await execute(record, query);
+			var query = _queryGenerator.GenerateDeleteQuery<TEntity>();
+			var result = await execute(entity, query);
 
-			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result, query);
+			return _resultChecker.ReturnOrThrowIfEntityIsNull(entity, info, result, query);
 		}
 		#endregion
 
 		#region Get
-		public TRecord Get(TPrimaryKeyRecord record)
+		public TEntity Get(TPrimaryKeyEntity entity)
 		{
-			return GetInternal(record, (pk, query) => Task.FromResult(ExecuteQuerySingleOrDefault(pk, query)))
+			return GetInternal(entity, (pk, query) => Task.FromResult(ExecuteQuerySingleOrDefault(pk, query)))
 					.GetAwaiter()
 					.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
 		}
 
-		public async Task<TRecord> GetAsync(TPrimaryKeyRecord record)
+		public async Task<TEntity> GetAsync(TPrimaryKeyEntity entity)
 		{
-			return await GetInternal(record, async (pk, query) => await ExecuteQuerySingleOrDefaultAsync(pk, query));
+			return await GetInternal(entity, async (pk, query) => await ExecuteQuerySingleOrDefaultAsync(pk, query));
 		}
 
-		private async Task<TRecord> GetInternal(TPrimaryKeyRecord record, Func<TPrimaryKeyRecord, string, Task<TRecord?>> execute)
+		private async Task<TEntity> GetInternal(TPrimaryKeyEntity entity, Func<TPrimaryKeyEntity, string, Task<TEntity?>> execute)
 		{
-			if (record == null)
+			if (entity == null)
 			{
-				throw new ArgumentNullException(nameof(record));
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			var info = RecordInformationCache.GetRecordInformation<TRecord>();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
-			CheckForDefaultPrimaryKeys(info, record);
+			CheckForDefaultPrimaryKeys(info, entity);
 
-			var query = _queryGenerator.GenerateGetQuery<TRecord>();
-			var result = await execute(record, query);
+			var query = _queryGenerator.GenerateGetQuery<TEntity>();
+			var result = await execute(entity, query);
 
-			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result, query);
+			return _resultChecker.ReturnOrThrowIfEntityIsNull(entity, info, result, query);
 		}
 		#endregion
 
 		#region GetAll
-		public IEnumerable<TRecord> GetAll()
+		public IEnumerable<TEntity> GetAll()
 		{
 			return GetAllInternalAsync((connection, query) => Task.FromResult(DapperInjection.Query.Invoke(connection, query)))
 						.GetAwaiter()
 						.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
 		}
 
-		public async Task<IEnumerable<TRecord>> GetAllAsync()
+		public async Task<IEnumerable<TEntity>> GetAllAsync()
 		{
 			return await GetAllInternalAsync(async (connection, query) => await DapperInjection.QueryAsync.Invoke(connection, query));
 		}
 
-		private async Task<IEnumerable<TRecord>> GetAllInternalAsync(Func<IDbConnection, string, Task<IEnumerable<TRecord>>> execute)
+		private async Task<IEnumerable<TEntity>> GetAllInternalAsync(Func<IDbConnection, string, Task<IEnumerable<TEntity>>> execute)
 		{
-			var query = _queryGenerator.GenerateGetAllQuery<TRecord>();
+			var query = _queryGenerator.GenerateGetAllQuery<TEntity>();
 			using var connection = CreateConnection();
 			return await execute(connection, query);
 		}
 		#endregion
 
 		#region Insert
-		public TRecord Insert(TRecord record)
+		public TEntity Insert(TEntity entity)
 		{
-			return InsertInternalAsync(record, (connection, query, input) => Task.FromResult(DapperInjection.QuerySingle.Invoke(connection, query, input)))
+			return InsertInternalAsync(entity, (connection, query, input) => Task.FromResult(DapperInjection.QuerySingle.Invoke(connection, query, input)))
 					.GetAwaiter()
 					.GetResult();
 		}
 
-		public async Task<TRecord> InsertAsync(TRecord record)
+		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
-			return await InsertInternalAsync(record, async (connection, query, input) => await DapperInjection.QuerySingleAsync.Invoke(connection, query, input));
+			return await InsertInternalAsync(entity, async (connection, query, input) => await DapperInjection.QuerySingleAsync.Invoke(connection, query, input));
 		}
 
-		private async Task<TRecord> InsertInternalAsync(TRecord record, Func<IDbConnection, string, TRecord, Task<TRecord>> execute)
+		private async Task<TEntity> InsertInternalAsync(TEntity entity, Func<IDbConnection, string, TEntity, Task<TEntity>> execute)
 		{
-			if (record == null)
+			if (entity == null)
 			{
-				throw new ArgumentNullException(nameof(record));
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			var info = RecordInformationCache.GetRecordInformation<TRecord>();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
 			var invalidIdentityColumns = info.PrimaryKeys
-												.Where(pk => pk.IsIdentity && !pk.HasDefaultValue(record))
+												.Where(pk => pk.IsIdentity && !pk.HasDefaultValue(entity))
 												.ToList();
 
 			if (invalidIdentityColumns.Any())
 			{
-				throw new ArgumentException($"record has the following primary keys marked with IsIdentity, which have non-default values: {string.Join(", ", invalidIdentityColumns.Select(col => col.Name))}", nameof(record));
+				throw new ArgumentException($"entity has the following primary keys marked with IsIdentity, which have non-default values: {string.Join(", ", invalidIdentityColumns.Select(col => col.Name))}", nameof(entity));
 			}
 
-			var query = _queryGenerator.GenerateInsertQuery(record);
+			var query = _queryGenerator.GenerateInsertQuery(entity);
 			using var connection = CreateConnection();
-			return await execute(connection, query, record);
+			return await execute(connection, query, entity);
 		}
 		#endregion
 
 		#region Update
-		public TRecord Update(TRecord record)
+		public TEntity Update(TEntity entity)
 		{
-			return UpdateInternalAsync(record, (input, query) => Task.FromResult(ExecuteQuerySingleOrDefault(input, query)))
+			return UpdateInternalAsync(entity, (input, query) => Task.FromResult(ExecuteQuerySingleOrDefault(input, query)))
 						.GetAwaiter()
 						.GetResult();
 		}
 
-		public async Task<TRecord> UpdateAsync(TRecord record)
+		public async Task<TEntity> UpdateAsync(TEntity entity)
 		{
-			return await UpdateInternalAsync(record, async (input, query) => await ExecuteQuerySingleOrDefaultAsync(input, query));
+			return await UpdateInternalAsync(entity, async (input, query) => await ExecuteQuerySingleOrDefaultAsync(input, query));
 		}
 
-		private async Task<TRecord> UpdateInternalAsync(TRecord record, Func<TRecord, string, Task<TRecord?>> execute)
+		private async Task<TEntity> UpdateInternalAsync(TEntity entity, Func<TEntity, string, Task<TEntity?>> execute)
 		{
-			if (record == null)
+			if (entity == null)
 			{
-				throw new ArgumentNullException(nameof(record));
+				throw new ArgumentNullException(nameof(entity));
 			}
 
-			var info = RecordInformationCache.GetRecordInformation<TRecord>();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
-			CheckForDefaultPrimaryKeys(info, record);
+			CheckForDefaultPrimaryKeys(info, entity);
 
-			var query = _queryGenerator.GenerateUpdateQuery<TRecord>();
-			var result = await execute(record, query);
+			var query = _queryGenerator.GenerateUpdateQuery<TEntity>();
+			var result = await execute(entity, query);
 
-			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result, query);
+			return _resultChecker.ReturnOrThrowIfEntityIsNull(entity, info, result, query);
 		}
 		#endregion
 
-		private static void CheckForDefaultPrimaryKeys(RecordInformation info, TPrimaryKeyRecord record)
+		private static void CheckForDefaultPrimaryKeys(EntityInformation info, TPrimaryKeyEntity entity)
 		{
 			var invalidPrimaryKeys = info.PrimaryKeys
-											   .Where(pk => pk.HasDefaultValue(record))
+											   .Where(pk => pk.HasDefaultValue(entity))
 											   .ToList();
 
 			if (invalidPrimaryKeys.Any())
 			{
-				throw new ArgumentException($"record has the following primary keys which have default values: {string.Join(", ", invalidPrimaryKeys.Select(col => col.Name))}", nameof(record));
+				throw new ArgumentException($"entity has the following primary keys which have default values: {string.Join(", ", invalidPrimaryKeys.Select(col => col.Name))}", nameof(entity));
 			}
 		}
 
-		private TRecord? ExecuteQuerySingleOrDefault(TPrimaryKeyRecord record, string query)
+		private TEntity? ExecuteQuerySingleOrDefault(TPrimaryKeyEntity entity, string query)
 		{
 			using var connection = CreateConnection();
-			return DapperInjection.QuerySingleOrDefault.Invoke(connection, query, record);
+			return DapperInjection.QuerySingleOrDefault.Invoke(connection, query, entity);
 		}
 
-		private async Task<TRecord?> ExecuteQuerySingleOrDefaultAsync(TPrimaryKeyRecord record, string query)
+		private async Task<TEntity?> ExecuteQuerySingleOrDefaultAsync(TPrimaryKeyEntity entity, string query)
 		{
 			using var connection = CreateConnection();
-			return await DapperInjection.QuerySingleOrDefaultAsync.Invoke(connection, query, record);
+			return await DapperInjection.QuerySingleOrDefaultAsync.Invoke(connection, query, entity);
 		}
 	}
 }

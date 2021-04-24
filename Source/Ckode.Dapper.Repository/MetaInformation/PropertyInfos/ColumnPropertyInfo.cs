@@ -39,14 +39,14 @@ namespace Ckode.Dapper.Repository.MetaInformation.PropertyInfos
 			HasSetter = _accessor.HasSetter;
 		}
 
-		public bool HasDefaultValue<T>(T record) where T : TableRecord
+		public bool HasDefaultValue<T>(T record) where T : TableEntity
 		{
 			var value = GetValue(record);
 
 			return value == _defaultValue || value?.Equals(_defaultValue) == true;
 		}
 
-		public object GetValue<T>(T record) where T : TableRecord
+		public object GetValue<T>(T record) where T : TableEntity
 		{
 			return _accessor.getter(record);
 		}

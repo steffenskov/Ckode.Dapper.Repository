@@ -1,9 +1,9 @@
 ﻿using System;
 using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Records
+namespace Ckode.Dapper.Repository.Tests.Entitys
 {
-	public record CustomColumnNamesRecord : TableRecord
+	public record CustomColumnNamesEntity : TableEntity
 	{
 		[PrimaryKeyColumn(isIdentity: true, columnName: "OrderId")]
 		public int Id { get; init; }

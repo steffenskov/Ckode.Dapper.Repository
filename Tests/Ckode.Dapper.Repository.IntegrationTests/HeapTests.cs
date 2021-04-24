@@ -1,7 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using Ckode.Dapper.Repository.IntegrationTests.Records;
+using Ckode.Dapper.Repository.IntegrationTests.Entitys;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 
@@ -14,10 +14,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name" };
+			var record = new UserHeapEntity { Username = "My name" };
 
 			// Act && Assert
-			Assert.Throws<NoRecordFoundException>(() => repository.Delete(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Delete(record));
 		}
 
 		[Fact]
@@ -25,15 +25,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name1", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "My name1", Password = "My secret" };
 			repository.Insert(record);
 
 			// Act
-			var deletedRecord = repository.Delete(record);
+			var deletedEntity = repository.Delete(record);
 
 			// Assert
-			Assert.Equal(record.Username, deletedRecord.Username);
-			Assert.Equal(record.Password, deletedRecord.Password);
+			Assert.Equal(record.Username, deletedEntity.Username);
+			Assert.Equal(record.Password, deletedEntity.Password);
 		}
 
 		[Fact]
@@ -41,15 +41,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name1", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "My name1", Password = "My secret" };
 			repository.Insert(record);
 			repository.Insert(record);
 
 			// Act
-			var deletedRecord = repository.Delete(record);
+			var deletedEntity = repository.Delete(record);
 
 			// Assert
-			Assert.Throws<NoRecordFoundException>(() => repository.Get(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Get(record));
 		}
 
 		[Fact]
@@ -57,10 +57,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "Not found", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "Not found", Password = "My secret" };
 
 			// Act && Assert
-			Assert.Throws<NoRecordFoundException>(() => repository.Get(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Get(record));
 		}
 
 		[Fact]
@@ -68,7 +68,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name4", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "My name4", Password = "My secret" };
 			repository.Insert(record);
 			repository.Insert(record);
 
@@ -92,15 +92,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name1", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "My name1", Password = "My secret" };
 			repository.Insert(record);
 
 			// Act
-			var deletedRecord = repository.Delete(record);
+			var deletedEntity = repository.Delete(record);
 
 			// Assert
-			Assert.Equal(record.Username, deletedRecord.Username);
-			Assert.Equal(record.Password, deletedRecord.Password);
+			Assert.Equal(record.Username, deletedEntity.Username);
+			Assert.Equal(record.Password, deletedEntity.Password);
 		}
 
 		[Fact]
@@ -108,7 +108,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name" };
+			var record = new UserHeapEntity { Username = "My name" };
 
 			// Act && Assert
 			Assert.Throws<SqlException>(() => repository.Insert(record));
@@ -119,19 +119,19 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name2", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "My name2", Password = "My secret" };
 
 			// Act
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 			try
 			{
 				// Assert
-				Assert.Equal(record.Username, insertedRecord.Username);
-				Assert.Equal(record.Password, insertedRecord.Password);
+				Assert.Equal(record.Username, insertedEntity.Username);
+				Assert.Equal(record.Password, insertedEntity.Password);
 			}
 			finally
 			{
-				repository.Delete(insertedRecord);
+				repository.Delete(insertedEntity);
 			}
 		}
 
@@ -140,7 +140,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapRecord { Username = "My name3", Password = "My secret" };
+			var record = new UserHeapEntity { Username = "My name3", Password = "My secret" };
 
 			// Act
 			repository.Insert(record);

@@ -1,9 +1,7 @@
-- Async support på HeapRepo
 - Aggregate repo inkl. FK usage
-- Omdøb record til entity
 
 
-- "GetMany<TRecord, TArgument>(TArgument arg)" og GetSingle ditto, 
+- "GetMany<TEntity, TArgument>(TArgument arg)" og GetSingle ditto, 
 Tilføj også Scalar<TArgument, TResult>(TArgument arg) samt non-query ditto.
-hvor reflection bruges på TArgument til at finde samtlige properties og mappe dem op til kendte columnName/PropertyNames på TRecord.
+hvor reflection bruges på TArgument til at finde samtlige properties og mappe dem op til kendte columnName/PropertyNames på TEntity.
 Mangler noget kan den kaste ArgumentException.

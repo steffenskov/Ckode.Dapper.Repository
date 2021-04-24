@@ -1,14 +1,14 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Records
+namespace Ckode.Dapper.Repository.IntegrationTests.Entitys
 {
-	public record CategoryPrimaryKeyRecord : TableRecord
+	public record CategoryPrimaryKeyEntity : TableEntity
 	{
 		[PrimaryKeyColumn(true, "CategoryID")]
 		public int CategoryId { get; init; }
 	}
 
-	public record CategoryRecord : CategoryPrimaryKeyRecord
+	public record CategoryEntity : CategoryPrimaryKeyEntity
 	{
 		[Column("CategoryName")]
 		public string Name { get; init; }

@@ -1,5 +1,5 @@
 using System;
-using Ckode.Dapper.Repository.IntegrationTests.Records;
+using Ckode.Dapper.Repository.IntegrationTests.Entitys;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 
@@ -12,21 +12,21 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
-			var record = new CompositeUserRecord
+			var record = new CompositeUserEntity
 			{
 				Username = "My name1",
 				Password = "Secret"
 			};
 
 			// Act
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
 			// Assert
 			try
 			{
-				Assert.Equal(record.Username, insertedRecord.Username);
-				Assert.Equal(record.Password, insertedRecord.Password);
-				Assert.True(insertedRecord.DateCreated > DateTime.UtcNow.AddHours(-1));
+				Assert.Equal(record.Username, insertedEntity.Username);
+				Assert.Equal(record.Password, insertedEntity.Password);
+				Assert.True(insertedEntity.DateCreated > DateTime.UtcNow.AddHours(-1));
 			}
 			finally
 			{
@@ -39,21 +39,21 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
-			var record = new CompositeUserRecord
+			var record = new CompositeUserEntity
 			{
 				Username = "My name2",
 				Password = "Secret"
 			};
 
 			// Act
-			var insertedRecord = repository.Insert(record);
+			var insertedEntity = repository.Insert(record);
 
 			// Assert
 			try
 			{
-				Assert.Equal(record.Username, insertedRecord.Username);
-				Assert.Equal(record.Password, insertedRecord.Password);
-				Assert.True(insertedRecord.DateCreated > DateTime.UtcNow.AddHours(-1));
+				Assert.Equal(record.Username, insertedEntity.Username);
+				Assert.Equal(record.Password, insertedEntity.Password);
+				Assert.True(insertedEntity.DateCreated > DateTime.UtcNow.AddHours(-1));
 			}
 			finally
 			{

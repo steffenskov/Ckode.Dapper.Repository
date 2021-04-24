@@ -2,30 +2,30 @@ using SqlMapper = Dapper.SqlMapper;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
-	public class MyDapperInjection<TRecord> : IDapperInjection<TRecord>
-	where TRecord : TableRecord
+	public class MyDapperInjection<TEntity> : IDapperInjection<TEntity>
+	where TEntity : TableEntity
 	{
-		public static MyDapperInjection<TRecord> Instance { get; }
+		public static MyDapperInjection<TEntity> Instance { get; }
 
 		static MyDapperInjection()
 		{
-			Instance = new MyDapperInjection<TRecord>();
+			Instance = new MyDapperInjection<TEntity>();
 		}
 
 		private MyDapperInjection() // Singleton pattern
 		{
 		}
 
-		public QuerySingleDelegate<TRecord> QuerySingle => SqlMapper.QuerySingle<TRecord>;
+		public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
 
-		public QuerySingleDelegate<TRecord> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TRecord>;
+		public QuerySingleDelegate<TEntity> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TEntity>;
 
-		public QueryDelegate<TRecord> Query => SqlMapper.Query<TRecord>;
+		public QueryDelegate<TEntity> Query => SqlMapper.Query<TEntity>;
 
-		public QuerySingleAsyncDelegate<TRecord> QuerySingleAsync => SqlMapper.QuerySingleAsync<TRecord>;
+		public QuerySingleAsyncDelegate<TEntity> QuerySingleAsync => SqlMapper.QuerySingleAsync<TEntity>;
 
-		public QuerySingleAsyncDelegate<TRecord> QuerySingleOrDefaultAsync => SqlMapper.QuerySingleOrDefaultAsync<TRecord>;
+		public QuerySingleAsyncDelegate<TEntity> QuerySingleOrDefaultAsync => SqlMapper.QuerySingleOrDefaultAsync<TEntity>;
 
-		public QueryAsyncDelegate<TRecord> QueryAsync => SqlMapper.QueryAsync<TRecord>;
+		public QueryAsyncDelegate<TEntity> QueryAsync => SqlMapper.QueryAsync<TEntity>;
 	}
 }
