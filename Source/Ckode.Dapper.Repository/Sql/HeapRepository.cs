@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using Ckode.Dapper.Repository.Interfaces;
 using Ckode.Dapper.Repository.MetaInformation;
 
@@ -34,7 +35,20 @@ namespace Ckode.Dapper.Repository.Sql
 
 		#endregion
 
+		#region Delete
 		public TRecord Delete(TRecord record)
+		{
+			return DeleteInternalAsync(record, (connection, query, input) => Task.FromResult(DapperInjection.Query.Invoke(connection, query, input)))
+						.GetAwaiter()
+						.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+		}
+
+		public async Task<TRecord> DeleteAsync(TRecord record)
+		{
+			return await DeleteInternalAsync(record, (connection, query, input) => DapperInjection.QueryAsync.Invoke(connection, query, input));
+		}
+
+		private async Task<TRecord> DeleteInternalAsync(TRecord record, Func<IDbConnection, string, TRecord, Task<IEnumerable<TRecord>>> execute)
 		{
 			if (record == null)
 			{
@@ -45,12 +59,26 @@ namespace Ckode.Dapper.Repository.Sql
 
 			var query = _queryGenerator.GenerateDeleteQuery<TRecord>();
 			using var connection = CreateConnection();
-			var result = DapperInjection.Query.Invoke(connection, query, record);
+			var result = await execute(connection, query, record);
 
 			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result.FirstOrDefault(), query);
 		}
+		#endregion
 
+		#region Get
 		public TRecord Get(TRecord record)
+		{
+			return GetInternalAsync(record, (connection, query, input) => Task.FromResult(DapperInjection.Query.Invoke(connection, query, input)))
+						.GetAwaiter()
+						.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+		}
+
+		public async Task<TRecord> GetAsync(TRecord record)
+		{
+			return await GetInternalAsync(record, (connection, query, input) => DapperInjection.QueryAsync.Invoke(connection, query, input));
+		}
+
+		private async Task<TRecord> GetInternalAsync(TRecord record, Func<IDbConnection, string, TRecord, Task<IEnumerable<TRecord>>> execute)
 		{
 			if (record == null)
 			{
@@ -61,19 +89,47 @@ namespace Ckode.Dapper.Repository.Sql
 
 			var query = _queryGenerator.GenerateGetQuery<TRecord>();
 			using var connection = CreateConnection();
-			var result = DapperInjection.Query.Invoke(connection, query, record);
+			var result = await execute(connection, query, record);
 
 			return _resultChecker.ReturnOrThrowIfRecordIsNull(record, info, result.FirstOrDefault(), query);
 		}
+		#endregion
 
+		#region GetAll
 		public IEnumerable<TRecord> GetAll()
+		{
+			return GetAllInternalAsync((connection, query) => Task.FromResult(DapperInjection.Query.Invoke(connection, query)))
+						.GetAwaiter()
+						.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+		}
+
+		public async Task<IEnumerable<TRecord>> GetAllAsync()
+		{
+			return await GetAllInternalAsync(async (connection, query) => await DapperInjection.QueryAsync.Invoke(connection, query));
+		}
+
+		private async Task<IEnumerable<TRecord>> GetAllInternalAsync(Func<IDbConnection, string, Task<IEnumerable<TRecord>>> execute)
 		{
 			var query = _queryGenerator.GenerateGetAllQuery<TRecord>();
 			using var connection = CreateConnection();
-			return DapperInjection.Query.Invoke(connection, query);
+			return await execute(connection, query);
+		}
+		#endregion
+
+		#region Insert
+		public TRecord Insert(TRecord record)
+		{
+			return InsertInternalAsync(record, (connection, query, input) => Task.FromResult(DapperInjection.QuerySingle.Invoke(connection, query, input)))
+					.GetAwaiter()
+					.GetResult();
 		}
 
-		public TRecord Insert(TRecord record)
+		public async Task<TRecord> InsertAsync(TRecord record)
+		{
+			return await InsertInternalAsync(record, async (connection, query, input) => await DapperInjection.QuerySingleAsync.Invoke(connection, query, input));
+		}
+
+		private async Task<TRecord> InsertInternalAsync(TRecord record, Func<IDbConnection, string, TRecord, Task<TRecord>> execute)
 		{
 			if (record == null)
 			{
@@ -82,7 +138,9 @@ namespace Ckode.Dapper.Repository.Sql
 
 			var query = _queryGenerator.GenerateInsertQuery(record);
 			using var connection = CreateConnection();
-			return DapperInjection.QuerySingle.Invoke(connection, query, record);
+			return await execute(connection, query, record);
 		}
+
+		#endregion
 	}
 }
