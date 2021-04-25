@@ -12,8 +12,11 @@ namespace Ckode.Dapper.Repository
 
 	public delegate Task<T> QuerySingleAsyncDelegate<T>(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
 
+	public delegate int ExecuteDelegate(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
+
+	public delegate Task<int> ExecuteAsyncDelegate(IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, int? commandTimeout = null, CommandType? commandType = null);
+
 	public interface IDapperInjection<TEntity>
-	where TEntity : TableEntity
 	{
 		QuerySingleDelegate<TEntity> QuerySingle { get; }
 
@@ -26,5 +29,9 @@ namespace Ckode.Dapper.Repository
 		QuerySingleAsyncDelegate<TEntity> QuerySingleOrDefaultAsync { get; }
 
 		QueryAsyncDelegate<TEntity> QueryAsync { get; }
+
+		ExecuteDelegate Execute { get; }
+
+		ExecuteAsyncDelegate ExecuteAsync { get; }
 	}
 }

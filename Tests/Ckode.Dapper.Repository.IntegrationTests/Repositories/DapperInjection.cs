@@ -3,19 +3,7 @@ using SqlMapper = Dapper.SqlMapper;
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
 	public class DapperInjection<TEntity> : IDapperInjection<TEntity>
-	where TEntity : TableEntity
 	{
-		public static DapperInjection<TEntity> Instance { get; }
-
-		static DapperInjection()
-		{
-			Instance = new DapperInjection<TEntity>();
-		}
-
-		private DapperInjection() // Singleton pattern
-		{
-		}
-
 		public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
 
 		public QuerySingleDelegate<TEntity> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TEntity>;
@@ -27,5 +15,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 		public QuerySingleAsyncDelegate<TEntity> QuerySingleOrDefaultAsync => SqlMapper.QuerySingleOrDefaultAsync<TEntity>;
 
 		public QueryAsyncDelegate<TEntity> QueryAsync => SqlMapper.QueryAsync<TEntity>;
+
+		public ExecuteDelegate Execute => SqlMapper.Execute;
+
+		public ExecuteAsyncDelegate ExecuteAsync => SqlMapper.ExecuteAsync;
 	}
 }

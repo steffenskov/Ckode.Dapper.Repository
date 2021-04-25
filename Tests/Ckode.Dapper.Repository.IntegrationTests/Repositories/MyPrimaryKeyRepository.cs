@@ -7,11 +7,14 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 	where TPrimaryKeyEntity : TableEntity
 	where TEntity : TPrimaryKeyEntity
 	{
-		protected override IDapperInjection<TEntity> DapperInjection => DapperInjection<TEntity>.Instance;
-
 		protected override IDbConnection CreateConnection()
 		{
 			return ConnectionFactory.CreateConnection();
+		}
+
+		protected override IDapperInjection<T> CreateDapperInjection<T>()
+		{
+			return new DapperInjection<T>();
 		}
 	}
 }

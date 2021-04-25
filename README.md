@@ -168,4 +168,4 @@ Should you want to add custom queries to your repository, it has a bunch of the 
 Notice the {FormattedTableName} there, that's a property which contains the proper Schema and TableName correctly formatted. By using this rather than typing out the name yourself, it'll be easier for you if you ever rename the table or move it to a different Schema.
 
 
-One finally notice: I'd highly recommend checking out the different parameters you can assign to [Column] and [PrimaryKey], as well as checking out what properties can be overridden in your BasePrimaryKeyRepository. This should give you further insight into how the library works.
+One finally notice: I'd highly recommend checking out the different parameters you can assign to [Column] and [PrimaryKey], as well as checking out what properties can be overridden in your BasePrimaryKeyRepository and which methods it already has for you to use. This should give you further insight into how the library works.
