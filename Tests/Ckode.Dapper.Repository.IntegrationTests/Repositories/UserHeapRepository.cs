@@ -1,4 +1,4 @@
-using Ckode.Dapper.Repository.IntegrationTests.Entitys;
+using Ckode.Dapper.Repository.IntegrationTests.Entities;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {

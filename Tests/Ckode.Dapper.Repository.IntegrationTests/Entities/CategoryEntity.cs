@@ -1,6 +1,6 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Entitys
+namespace Ckode.Dapper.Repository.IntegrationTests.Entities
 {
 	public record CategoryPrimaryKeyEntity : TableEntity
 	{

@@ -1,7 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using Ckode.Dapper.Repository.IntegrationTests.Entitys;
+using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 

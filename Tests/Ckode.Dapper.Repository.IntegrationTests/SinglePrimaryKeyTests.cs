@@ -1,7 +1,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using Ckode.Dapper.Repository.IntegrationTests.Entitys;
+using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 
@@ -180,10 +180,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			var repository = new CategoryRepository();
 
 			// Act
-			var fetchedEntitys = repository.GetAll();
+			var fetchedEntities = repository.GetAll();
 
 			// Assert
-			Assert.True(fetchedEntitys.Count() > 0);
+			Assert.True(fetchedEntities.Count() > 0);
 		}
 		#endregion
 

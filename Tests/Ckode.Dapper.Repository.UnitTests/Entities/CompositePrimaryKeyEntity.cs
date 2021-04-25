@@ -1,7 +1,7 @@
 ﻿using System;
 using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Entitys
+namespace Ckode.Dapper.Repository.Tests.Entities
 {
 	internal record CompositePrimaryKeyEntity : TableEntity
 	{
