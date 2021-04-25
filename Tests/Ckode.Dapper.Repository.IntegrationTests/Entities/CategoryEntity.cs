@@ -2,7 +2,7 @@
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Entities
 {
-	public record CategoryPrimaryKeyEntity(int CategoryId) : TableEntity
+	public record CategoryPrimaryKeyEntity() : TableEntity
 	{
 		[PrimaryKeyColumn(true, "CategoryID")]
 		public int CategoryId { get; init; }
