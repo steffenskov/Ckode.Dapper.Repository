@@ -4,13 +4,17 @@ This is an extension library for the Dapper ORM, giving you simple-to-use reposi
 ## Installation:
 
 I recommend using the NuGet package: https://www.nuget.org/packages/Ckode.ServiceLocator/ however you can also simply clone the repository and compile the project yourself.
+
 As the project is licensed under MIT you're free to use it for pretty much anything you want.
+
 You also need to install Dapper yourself, again I'd recommend NuGet: https://www.nuget.org/packages/Dapper/
+
 As for versioning of Dapper, you're actually (somewhat) free to choose whichever you want, as this library isn't built targetting a specific version of Dapper.
 
 ## Requirements:
 
 The library requires .Net 5.0 with C# 9 or later, as it's using the "record" type rather than "class" for representing the single entities. (e.g. An "User" from your "Users" table)
+
 Also it currently only supports MS Sql, but feel free to branch it and create support for MySql, PostGre or whatever you're using (as long as Dapper supports it, this library can too)
 
 ## Upcoming features:
