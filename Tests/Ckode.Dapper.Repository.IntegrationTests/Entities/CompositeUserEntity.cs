@@ -6,10 +6,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Entities
 	public record CompositeUserPrimaryKeyEntity : TableEntity
 	{
 		[PrimaryKeyColumn(isIdentity: false)]
-		public string Username { get; init; }
+		public string Username { get; init; } = default!;
 
 		[PrimaryKeyColumn(isIdentity: false)]
-		public string Password { get; init; }
+		public string Password { get; init; } = default!;
 	}
 
 	public record CompositeUserEntity : CompositeUserPrimaryKeyEntity
@@ -19,5 +19,6 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Entities
 
 		[Column]
 		public int? Age { get; init; }
+
 	}
 }

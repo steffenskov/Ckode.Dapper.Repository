@@ -21,7 +21,7 @@ Also it currently only supports MS Sql, but feel free to branch it and create su
 
 - Repository for aggregates, like e.g. an Order entity with an IList\<OrderLine\> property containing all the orderlines for the order. The idea is you can just call any CRUD method on the repository with an aggregate, and it'll figure out foreign keys etc. for you to ensure everything is inserted/updated/deleted/retrieved in the proper order. Kind of like what Entity Framework does, just better :-P
 - Built-in caching with automatic cache invalidation
-- Fixing the compiler warning about non-nullable properties on the entity records. (only an issue in projects with nullable enabled, and it's just a "false positive" type of warning)
+
 
 ## Usage:
 
@@ -111,10 +111,10 @@ Our UserEntity.cs file would therefore look like this:
         public record UserEntity : UserPrimaryKeyEntity
         {
             [Column]
-            public string Username { get; init; }
+            public string Username { get; init; } = default!;
 
             [Column]
-            public string Password { get; init; }
+            public string Password { get; init; } = default!;
 
             [Column]
             public string? Description { get; init; }
@@ -124,10 +124,16 @@ Our UserEntity.cs file would therefore look like this:
         }
     }
 
-You'll notice I've enabled nullable in this case, and I'm marking Description as string?. If you're not working with nullable just remove the ?.
-Also this example WILL currently generate compiler warnings about the properties Username, Password and DateCreated because they're not nullable and no constructor ensures they have a value. I'm currently working on figuring out how to remove these.
+You'll notice I've enabled nullable in the project in this case, and I'm marking Description as string?. If you're not working with nullable just remove the ?, and the " = default!;" too.
+
+The " = default!;" part is basically here to suppress warning *CS8616: Non-nullable property 'Username' must contain a non-null value when exiting constructor. Consider declaring the property as nullable.*
+What this does, is it set the property to null, and adds the "null-forgiving operator !" to tell the compiler to stop complaining.
+
+This is ok here, because we're either getting entities from the SQL server, in which case the properties won't be null, or creating a full instance to insert, in which case it also won't be null.
+
 
 Why the split between two record types you ask? It's for simplifying the Delete and Get methods on the repository.
+
 Rather than having to supply a full UserEntity instance as parameter to them, you can now just supply the UserPrimaryKeyEntity (e.g. the Id of the user to Delete or Get)
 
 The final part is defining your repository, this in turn requires very little code as most of the functionality is built-in:
