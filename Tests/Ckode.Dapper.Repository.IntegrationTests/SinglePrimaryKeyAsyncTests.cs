@@ -1,27 +1,28 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 
 namespace Ckode.Dapper.Repository.IntegrationTests
 {
-	public class SinglePrimaryKeyTests
+	public class SinglePrimaryKeyAsyncTests
 	{
 		#region Delete
 		[Fact]
-		public void Delete_InputIsNull_Throws()
+		public async Task Delete_InputIsNull_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentNullException>(() => repository.Delete(null!));
+			await Assert.ThrowsAsync<ArgumentNullException>(async () => await repository.DeleteAsync(null!));
 		}
 
 		[Fact]
-		public void Delete_PrimaryKeyNotEntered_Throws()
+		public async Task Delete_PrimaryKeyNotEntered_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -32,21 +33,21 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Delete(entity));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.DeleteAsync(entity));
 		}
 
 		[Fact]
-		public void Delete_UseMissingPrimaryKeyValue_Throws()
+		public async Task Delete_UseMissingPrimaryKeyValue_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
+			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await repository.DeleteAsync(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
 		}
 
 		[Fact]
-		public void Delete_UsePrimaryKey_Valid()
+		public async Task Delete_UsePrimaryKey_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -56,10 +57,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedEntity = repository.Insert(entity);
+			var insertedEntity = await repository.InsertAsync(entity);
 
 			// Act
-			var deleted = repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
+			var deleted = await repository.DeleteAsync(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
 			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
@@ -69,7 +70,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		}
 
 		[Fact]
-		public void Delete_UseEntity_Valid()
+		public async Task Delete_UseEntity_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -79,10 +80,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedEntity = repository.Insert(entity);
+			var insertedEntity = await repository.InsertAsync(entity);
 
 			// Act
-			var deleted = repository.Delete(insertedEntity);
+			var deleted = await repository.DeleteAsync(insertedEntity);
 
 			// Assert
 			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
@@ -94,17 +95,17 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 
 		#region Get
 		[Fact]
-		public void Get_InputIsNull_Throws()
+		public async Task Get_InputIsNull_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentNullException>(() => repository.Get(null!));
+			await Assert.ThrowsAsync<ArgumentNullException>(async () => await repository.GetAsync(null!));
 		}
 
 		[Fact]
-		public void Get_UsePrimaryKey_Valid()
+		public async Task Get_UsePrimaryKey_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -114,21 +115,21 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedEntity = repository.Insert(entity);
+			var insertedEntity = await repository.InsertAsync(entity);
 
 			// Act
-			var fetchedEntity = repository.Get(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
+			var fetchedEntity = await repository.GetAsync(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
 			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
 			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
 			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
 
-			repository.Delete(insertedEntity);
+			await repository.DeleteAsync(insertedEntity);
 		}
 
 		[Fact]
-		public void Get_UseFullEntity_Valid()
+		public async Task Get_UseFullEntity_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -138,49 +139,49 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 				Name = "Lorem ipsum",
 				Picture = null
 			};
-			var insertedEntity = repository.Insert(entity);
+			var insertedEntity = await repository.InsertAsync(entity);
 
 			// Act
-			var fetchedEntity = repository.Get(insertedEntity);
+			var fetchedEntity = await repository.GetAsync(insertedEntity);
 
 			// Assert
 			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
 			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
 			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
 
-			repository.Delete(insertedEntity);
+			await repository.DeleteAsync(insertedEntity);
 		}
 
 		[Fact]
-		public void Get_PrimaryKeyNotEntered_Throws()
+		public async Task Get_PrimaryKeyNotEntered_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Get(new CategoryPrimaryKeyEntity { }));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.GetAsync(new CategoryPrimaryKeyEntity { }));
 		}
 
 		[Fact]
-		public void Get_UseMissingPrimaryKey_Throws()
+		public async Task Get_UseMissingPrimaryKey_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
+			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await repository.GetAsync(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
 		}
 		#endregion
 
 		#region GetAll
 		[Fact]
-		public void GetAll_NoInput_Valid()
+		public async Task GetAll_NoInput_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act
-			var fetchedEntities = repository.GetAll();
+			var fetchedEntities = await repository.GetAllAsync();
 
 			// Assert
 			Assert.True(fetchedEntities.Count() > 0);
@@ -189,17 +190,17 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 
 		#region Insert
 		[Fact]
-		public void Insert_InputIsNull_Throws()
+		public async Task Insert_InputIsNull_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentNullException>(() => repository.Insert(null!));
+			await Assert.ThrowsAsync<ArgumentNullException>(async () => await repository.InsertAsync(null!));
 		}
 
 		[Fact]
-		public void Insert_HasIdentityKeyWithValue_Throws()
+		public async Task Insert_HasIdentityKeyWithValue_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -212,11 +213,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Insert(entity));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.InsertAsync(entity));
 		}
 
 		[Fact]
-		public void Insert_HasIdentityKeyWithoutValue_IsInserted()
+		public async Task Insert_HasIdentityKeyWithoutValue_IsInserted()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -228,7 +229,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act
-			var insertedEntity = repository.Insert(entity);
+			var insertedEntity = await repository.InsertAsync(entity);
 			try
 			{
 				// Assert
@@ -239,12 +240,12 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 			finally
 			{
-				repository.Delete(insertedEntity);
+				await repository.DeleteAsync(insertedEntity);
 			}
 		}
 
 		[Fact]
-		public void Insert_NonNullPropertyMissing_Throws()
+		public async Task Insert_NonNullPropertyMissing_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -256,23 +257,23 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act && Assert
-			Assert.Throws<SqlException>(() => repository.Insert(entity));
+			await Assert.ThrowsAsync<SqlException>(async () => await repository.InsertAsync(entity));
 		}
 		#endregion
 
 		#region Update
 		[Fact]
-		public void Update_InputIsNull_Throws()
+		public async Task Update_InputIsNull_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentNullException>(() => repository.Update(null!));
+			await Assert.ThrowsAsync<ArgumentNullException>(async () => await repository.UpdateAsync(null!));
 		}
 
 		[Fact]
-		public void Update_UseEntity_Valid()
+		public async Task Update_UseEntity_Valid()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -281,21 +282,21 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 				Description = "Lorem ipsum, dolor sit amit",
 				Name = "Hello world"
 			};
-			var insertedEntity = repository.Insert(entity);
+			var insertedEntity = await repository.InsertAsync(entity);
 
 			var update = insertedEntity with { Description = "Something else" };
 
 			// Act
-			var updatedEntity = repository.Update(update);
+			var updatedEntity = await repository.UpdateAsync(update);
 
 			// Assert
 			Assert.Equal("Something else", updatedEntity.Description);
 
-			repository.Delete(insertedEntity);
+			await repository.DeleteAsync(insertedEntity);
 		}
 
 		[Fact]
-		public void Update_PrimaryKeyNotEntered_Throws()
+		public async Task Update_PrimaryKeyNotEntered_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -306,11 +307,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Update(entity));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.UpdateAsync(entity));
 		}
 
 		[Fact]
-		public void Update_UseMissingPrimaryKeyValue_Throws()
+		public async Task Update_UseMissingPrimaryKeyValue_Throws()
 		{
 			// Arrange
 			var repository = new CategoryRepository();
@@ -322,7 +323,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			};
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Update(entity));
+			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await repository.UpdateAsync(entity));
 		}
 		#endregion
 	}

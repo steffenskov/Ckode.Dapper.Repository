@@ -14,10 +14,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name" };
+			var entity = new UserHeapEntity { Username = "async My name" };
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Delete(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Delete(entity));
 		}
 
 		[Fact]
@@ -25,15 +25,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name1", Password = "My secret" };
-			repository.Insert(record);
+			var entity = new UserHeapEntity { Username = "async My name1", Password = "My secret" };
+			repository.Insert(entity);
 
 			// Act
-			var deletedEntity = repository.Delete(record);
+			var deletedEntity = repository.Delete(entity);
 
 			// Assert
-			Assert.Equal(record.Username, deletedEntity.Username);
-			Assert.Equal(record.Password, deletedEntity.Password);
+			Assert.Equal(entity.Username, deletedEntity.Username);
+			Assert.Equal(entity.Password, deletedEntity.Password);
 		}
 
 		[Fact]
@@ -41,15 +41,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name1", Password = "My secret" };
-			repository.Insert(record);
-			repository.Insert(record);
+			var entity = new UserHeapEntity { Username = "async My name1", Password = "My secret" };
+			repository.Insert(entity);
+			repository.Insert(entity);
 
 			// Act
-			var deletedEntity = repository.Delete(record);
+			var deletedEntity = repository.Delete(entity);
 
 			// Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Get(entity));
 		}
 
 		[Fact]
@@ -57,10 +57,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "Not found", Password = "My secret" };
+			var entity = new UserHeapEntity { Username = "Not found", Password = "My secret" };
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(record));
+			Assert.Throws<NoEntityFoundException>(() => repository.Get(entity));
 		}
 
 		[Fact]
@@ -68,22 +68,22 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name4", Password = "My secret" };
-			repository.Insert(record);
-			repository.Insert(record);
+			var entity = new UserHeapEntity { Username = "async My name4", Password = "My secret" };
+			repository.Insert(entity);
+			repository.Insert(entity);
 
 			// Act
-			var gotten = repository.Get(record);
+			var gotten = repository.Get(entity);
 
 			try
 			{
 				// Assert
-				Assert.Equal(record.Username, gotten.Username);
-				Assert.Equal(record.Password, gotten.Password);
+				Assert.Equal(entity.Username, gotten.Username);
+				Assert.Equal(entity.Password, gotten.Password);
 			}
 			finally
 			{
-				repository.Delete(record);
+				repository.Delete(entity);
 			}
 		}
 
@@ -92,15 +92,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name1", Password = "My secret" };
-			repository.Insert(record);
+			var entity = new UserHeapEntity { Username = "async My name1", Password = "My secret" };
+			repository.Insert(entity);
 
 			// Act
-			var deletedEntity = repository.Delete(record);
+			var deletedEntity = repository.Delete(entity);
 
 			// Assert
-			Assert.Equal(record.Username, deletedEntity.Username);
-			Assert.Equal(record.Password, deletedEntity.Password);
+			Assert.Equal(entity.Username, deletedEntity.Username);
+			Assert.Equal(entity.Password, deletedEntity.Password);
 		}
 
 		[Fact]
@@ -108,10 +108,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name" };
+			var entity = new UserHeapEntity { Username = "async My name" };
 
 			// Act && Assert
-			Assert.Throws<SqlException>(() => repository.Insert(record));
+			Assert.Throws<SqlException>(() => repository.Insert(entity));
 		}
 
 		[Fact]
@@ -119,15 +119,15 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name2", Password = "My secret" };
+			var entity = new UserHeapEntity { Username = "async My name2", Password = "My secret" };
 
 			// Act
-			var insertedEntity = repository.Insert(record);
+			var insertedEntity = repository.Insert(entity);
 			try
 			{
 				// Assert
-				Assert.Equal(record.Username, insertedEntity.Username);
-				Assert.Equal(record.Password, insertedEntity.Password);
+				Assert.Equal(entity.Username, insertedEntity.Username);
+				Assert.Equal(entity.Password, insertedEntity.Password);
 			}
 			finally
 			{
@@ -140,11 +140,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var record = new UserHeapEntity { Username = "My name3", Password = "My secret" };
+			var entity = new UserHeapEntity { Username = "async My name3", Password = "My secret" };
 
 			// Act
-			repository.Insert(record);
-			repository.Insert(record);
+			repository.Insert(entity);
+			repository.Insert(entity);
 			try
 			{
 				// Assert
@@ -153,7 +153,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 			finally
 			{
-				repository.Delete(record);
+				repository.Delete(entity);
 			}
 		}
 	}

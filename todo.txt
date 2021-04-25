@@ -1,5 +1,6 @@
 - Aggregate repo inkl. FK usage
 
+- Find af hvad der gøres med non-nullable properties på entities. (Compiler warning når nullable er slået til)
 
 - "GetMany<TEntity, TArgument>(TArgument arg)" og GetSingle ditto, 
 Tilføj også Scalar<TArgument, TResult>(TArgument arg) samt non-query ditto.

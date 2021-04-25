@@ -7,11 +7,11 @@ namespace Ckode.Dapper.Repository.Interfaces
 		where TPrimaryKeyEntity : TableEntity
 		where TEntity : TPrimaryKeyEntity
 	{
-		TEntity Delete(TPrimaryKeyEntity record);
-		Task<TEntity> DeleteAsync(TPrimaryKeyEntity record);
+		TEntity Delete(TPrimaryKeyEntity entity);
+		Task<TEntity> DeleteAsync(TPrimaryKeyEntity entity);
 
-		TEntity Get(TPrimaryKeyEntity record);
-		Task<TEntity> GetAsync(TPrimaryKeyEntity record);
+		TEntity Get(TPrimaryKeyEntity entity);
+		Task<TEntity> GetAsync(TPrimaryKeyEntity entity);
 
 		IEnumerable<TEntity> GetAll();
 		Task<IEnumerable<TEntity>> GetAllAsync();

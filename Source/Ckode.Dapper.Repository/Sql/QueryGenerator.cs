@@ -90,14 +90,14 @@ namespace Ckode.Dapper.Repository.Sql
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			if (!info.PrimaryKeys.Any())
 			{
-				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TEntity).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
+				throw new InvalidOperationException($"GenerateGetQuery for entity of type {typeof(TEntity).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
 			}
 
 			var setClause = GenerateSetClause(info);
 
 			if (string.IsNullOrEmpty(setClause))
 			{
-				throw new InvalidOperationException($"GenerateGetQuery for record of type {typeof(TEntity).FullName} failed as the type has no columns with a setter.");
+				throw new InvalidOperationException($"GenerateGetQuery for entity of type {typeof(TEntity).FullName} failed as the type has no columns with a setter.");
 			}
 
 			var outputColumns = GenerateColumnsList("inserted", info.Columns);

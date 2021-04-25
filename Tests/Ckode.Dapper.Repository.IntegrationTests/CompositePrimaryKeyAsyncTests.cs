@@ -1,46 +1,47 @@
 using System;
+using System.Threading.Tasks;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.Repositories;
 using Xunit;
 
 namespace Ckode.Dapper.Repository.IntegrationTests
 {
-	public class CompositePrimaryKeyTests
+	public class CompositePrimaryKeyAsyncTests
 	{
 		[Fact]
-		public void Delete_PrimaryKeyPartiallyNotEntered_Throws()
+		public async Task Delete_PrimaryKeyPartiallyNotEntered_Throws()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Delete(new CompositeUserPrimaryKeyEntity { Username = "My name" }));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.DeleteAsync(new CompositeUserPrimaryKeyEntity { Username = "async My name" }));
 		}
 
 		[Fact]
-		public void Delete_UseMissingPrimaryKeyValue_Throws()
+		public async Task Delete_UseMissingPrimaryKeyValue_Throws()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Delete(new CompositeUserPrimaryKeyEntity { Username = "My name", Password = "Secret" }));
+			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await repository.DeleteAsync(new CompositeUserPrimaryKeyEntity { Username = "async My name", Password = "Secret" }));
 		}
 
 		[Fact]
-		public void Delete_UsePrimaryKey_Valid()
+		public async Task Delete_UsePrimaryKey_Valid()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 			var entity = new CompositeUserEntity
 			{
-				Username = "My name1",
+				Username = "async My name1",
 				Password = "Secret"
 			};
 			var insertedEntity = repository.Insert(entity);
 
 			// Act
-			var deleted = repository.Delete(new CompositeUserPrimaryKeyEntity { Username = "My name1", Password = "Secret" });
+			var deleted = await repository.DeleteAsync(new CompositeUserPrimaryKeyEntity { Username = "async My name1", Password = "Secret" });
 
 			// Assert
 			Assert.Equal(entity.Username, deleted.Username);
@@ -49,76 +50,76 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		}
 
 		[Fact]
-		public void Get_PrimaryKeyPartiallyNotEntered_Throws()
+		public async Task Get_PrimaryKeyPartiallyNotEntered_Throws()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Get(new CompositeUserPrimaryKeyEntity { Username = "My name" }));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.GetAsync(new CompositeUserPrimaryKeyEntity { Username = "async My name" }));
 		}
 
 		[Fact]
-		public void Get_UseMissingPrimaryKeyValue_Throws()
+		public async Task Get_UseMissingPrimaryKeyValue_Throws()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(new CompositeUserPrimaryKeyEntity { Username = "My name", Password = "Secret" }));
+			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await repository.GetAsync(new CompositeUserPrimaryKeyEntity { Username = "async My name", Password = "Secret" }));
 		}
 
 		[Fact]
-		public void Get_UsePrimaryKey_Valid()
+		public async Task Get_UsePrimaryKey_Valid()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 			var entity = new CompositeUserEntity
 			{
-				Username = "My name2",
+				Username = "async My name2",
 				Password = "Secret"
 			};
 			var insertedEntity = repository.Insert(entity);
 
 			// Act
-			var gotten = repository.Get(new CompositeUserPrimaryKeyEntity { Username = "My name2", Password = "Secret" });
+			var gotten = repository.Get(new CompositeUserPrimaryKeyEntity { Username = "async My name2", Password = "Secret" });
 
 			// Assert
 			Assert.Equal(entity.Username, gotten.Username);
 			Assert.Equal(entity.Password, gotten.Password);
 			Assert.Equal(insertedEntity.DateCreated, gotten.DateCreated);
 
-			repository.Delete(insertedEntity);
+			await repository.DeleteAsync(insertedEntity);
 		}
 
 		[Fact]
-		public void Update_PrimaryKeyPartiallyNotEntered_Throws()
+		public async Task Update_PrimaryKeyPartiallyNotEntered_Throws()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 
 			// Act && Assert
-			Assert.Throws<ArgumentException>(() => repository.Update(new CompositeUserEntity { Username = "My name" }));
+			await Assert.ThrowsAsync<ArgumentException>(async () => await repository.UpdateAsync(new CompositeUserEntity { Username = "async My name" }));
 		}
 
 		[Fact]
-		public void Update_UseMissingPrimaryKeyValue_Throws()
+		public async Task Update_UseMissingPrimaryKeyValue_Throws()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => repository.Update(new CompositeUserEntity { Username = "Doesnt exist", Password = "Secret" }));
+			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await repository.UpdateAsync(new CompositeUserEntity { Username = "Doesnt exist", Password = "Secret" }));
 		}
 
 		[Fact]
-		public void Update_UsePrimaryKey_Valid()
+		public async Task Update_UsePrimaryKey_Valid()
 		{
 			// Arrange
 			var repository = new CompositeUserRepository();
 			var entity = new CompositeUserEntity
 			{
-				Username = "My name3",
+				Username = "async My name3",
 				Password = "Secret"
 			};
 			var insertedEntity = repository.Insert(entity);
@@ -133,7 +134,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.Equal(42, updated.Age);
 			Assert.Equal(insertedEntity.DateCreated, updated.DateCreated);
 
-			repository.Delete(insertedEntity);
+			await repository.DeleteAsync(insertedEntity);
 		}
 	}
 }

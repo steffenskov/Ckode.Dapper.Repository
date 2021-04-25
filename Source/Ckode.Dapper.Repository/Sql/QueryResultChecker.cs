@@ -10,28 +10,28 @@ namespace Ckode.Dapper.Repository.Sql
 	where TPrimaryKeyEntity : TableEntity
 	where TEntity : TPrimaryKeyEntity
 	{
-		public TEntity ReturnOrThrowIfEntityIsNull(TPrimaryKeyEntity record, EntityInformation info, TEntity? result, string query)
+		public TEntity ReturnOrThrowIfEntityIsNull(TPrimaryKeyEntity entity, EntityInformation info, TEntity? result, string query)
 		{
 			if (result == null)
 			{
-				var formattedPrimaryKeys = PrintPrimaryKeys(info.PrimaryKeys, record);
+				var formattedPrimaryKeys = PrintPrimaryKeys(info.PrimaryKeys, entity);
 				var errorMessage = info.PrimaryKeys.Any()
-										? $"No matching record found with the given primary keys."
-										: $"No matching record found with the given values.";
+										? $"No matching entity found with the given primary keys."
+										: $"No matching entity found with the given values.";
 
 				throw new NoEntityFoundException(query, formattedPrimaryKeys, errorMessage);
 			}
 			return result;
 		}
 
-		private static string PrintPrimaryKeys(IReadOnlyCollection<PrimaryKeyPropertyInfo> primaryKeys, TPrimaryKeyEntity record)
+		private static string PrintPrimaryKeys(IReadOnlyCollection<PrimaryKeyPropertyInfo> primaryKeys, TPrimaryKeyEntity entity)
 		{
-			return string.Join(Environment.NewLine, primaryKeys.Select(pk => $"{pk.Name} = {FormatPrimaryKeyValue(pk, record)}"));
+			return string.Join(Environment.NewLine, primaryKeys.Select(pk => $"{pk.Name} = {FormatPrimaryKeyValue(pk, entity)}"));
 		}
 
-		private static string FormatPrimaryKeyValue(PrimaryKeyPropertyInfo primaryKey, TPrimaryKeyEntity record)
+		private static string FormatPrimaryKeyValue(PrimaryKeyPropertyInfo primaryKey, TPrimaryKeyEntity entity)
 		{
-			var valueAsString = primaryKey.GetValue(record)?.ToString() ?? "null";
+			var valueAsString = primaryKey.GetValue(entity)?.ToString() ?? "null";
 			if (primaryKey.Type == typeof(string))
 				return $@"""{valueAsString}""";
 			else
