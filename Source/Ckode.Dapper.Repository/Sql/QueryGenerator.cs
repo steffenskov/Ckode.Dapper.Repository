@@ -37,7 +37,7 @@ namespace Ckode.Dapper.Repository.Sql
 		}
 
 		public string GenerateDeleteQuery<TEntity>()
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
@@ -50,7 +50,7 @@ namespace Ckode.Dapper.Repository.Sql
 		}
 
 		public string GenerateInsertQuery<TEntity>(TEntity entity)
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var identityColumns = info.PrimaryKeys.Where(pk => pk.IsIdentity).Select(pk => pk.Property).ToList();
@@ -64,7 +64,7 @@ namespace Ckode.Dapper.Repository.Sql
 		}
 
 		public string GenerateGetAllQuery<TEntity>()
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var columnsList = GenerateColumnsList(_schemaAndTable, info.Columns);
@@ -72,7 +72,7 @@ namespace Ckode.Dapper.Repository.Sql
 		}
 
 		public string GenerateGetQuery<TEntity>()
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var whereClause = info.PrimaryKeys.Count == 0
@@ -85,7 +85,7 @@ namespace Ckode.Dapper.Repository.Sql
 		}
 
 		public string GenerateUpdateQuery<TEntity>()
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			if (!info.PrimaryKeys.Any())

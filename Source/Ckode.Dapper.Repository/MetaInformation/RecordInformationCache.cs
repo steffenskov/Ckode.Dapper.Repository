@@ -18,7 +18,7 @@ namespace Ckode.Dapper.Repository.MetaInformation
 		}
 
 		public static EntityInformation GetEntityInformation<TEntity>()
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var type = typeof(TEntity);
 			if (!_cache.TryGetValue(type, out var result))
@@ -35,7 +35,7 @@ namespace Ckode.Dapper.Repository.MetaInformation
 		}
 
 		private static EntityInformation CreateEntityInformation<TEntity>()
-			where TEntity : TableEntity
+		where TEntity : TableEntity
 		{
 			var properties = TypeCache.GetProperties<TEntity>();
 			var primaryKeys = new List<PrimaryKeyPropertyInfo>();

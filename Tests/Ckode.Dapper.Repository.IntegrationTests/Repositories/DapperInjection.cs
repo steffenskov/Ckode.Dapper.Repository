@@ -2,17 +2,17 @@ using SqlMapper = Dapper.SqlMapper;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
-	public class MyDapperInjection<TEntity> : IDapperInjection<TEntity>
+	public class DapperInjection<TEntity> : IDapperInjection<TEntity>
 	where TEntity : TableEntity
 	{
-		public static MyDapperInjection<TEntity> Instance { get; }
+		public static DapperInjection<TEntity> Instance { get; }
 
-		static MyDapperInjection()
+		static DapperInjection()
 		{
-			Instance = new MyDapperInjection<TEntity>();
+			Instance = new DapperInjection<TEntity>();
 		}
 
-		private MyDapperInjection() // Singleton pattern
+		private DapperInjection() // Singleton pattern
 		{
 		}
 

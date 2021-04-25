@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 namespace Ckode.Dapper.Repository.Interfaces
 {
 	public interface IRepository<TPrimaryKeyEntity, TEntity>
-		where TPrimaryKeyEntity : TableEntity
-		where TEntity : TPrimaryKeyEntity
+	where TPrimaryKeyEntity : TableEntity
+	where TEntity : TPrimaryKeyEntity
 	{
 		TEntity Delete(TPrimaryKeyEntity entity);
 		Task<TEntity> DeleteAsync(TPrimaryKeyEntity entity);

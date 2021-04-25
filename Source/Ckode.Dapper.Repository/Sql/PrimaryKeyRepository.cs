@@ -12,8 +12,8 @@ namespace Ckode.Dapper.Repository.Sql
 	/// Provides a repository for tables with a primary key defined (either single column or composite)
 	/// </summary>
 	public abstract class PrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : BaseRepository<TEntity>, IRepository<TPrimaryKeyEntity, TEntity>
-		where TPrimaryKeyEntity : TableEntity
-		where TEntity : TPrimaryKeyEntity
+	where TPrimaryKeyEntity : TableEntity
+	where TEntity : TPrimaryKeyEntity
 	{
 		private readonly QueryGenerator _queryGenerator;
 		private readonly QueryResultChecker<TPrimaryKeyEntity, TEntity> _resultChecker;
