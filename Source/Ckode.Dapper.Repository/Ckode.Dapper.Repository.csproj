@@ -9,8 +9,13 @@
     <PackageId>Ckode.Dapper.Repository</PackageId>
     <Authors>Steffen Skov</Authors>
 	<PackageTags>dapper;orm;sql;repository;</PackageTags>
+	<PackageLicenseFile>../../LICENSE</PackageLicenseFile>
+	<RepositoryUrl>https://github.com/NQbbe/Ckode.Dapper.Repository.git</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType> 
 	<Description>
 	  This is an extension library for the Dapper ORM, giving you simple-to-use repositories for all your database access code.
+
+	  You can read the full documentation on its github page here: https://github.com/NQbbe/Ckode.Dapper.Repository/
 	</Description>
   </PropertyGroup>
 
