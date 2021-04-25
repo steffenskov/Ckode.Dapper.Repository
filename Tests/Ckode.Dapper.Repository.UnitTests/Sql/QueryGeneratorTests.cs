@@ -1,6 +1,6 @@
 using System;
 using Ckode.Dapper.Repository.Sql;
-using Ckode.Dapper.Repository.Tests.Entitys;
+using Ckode.Dapper.Repository.Tests.Entities;
 using Xunit;
 
 namespace Ckode.Dapper.Repository.Tests.Sql
@@ -84,7 +84,7 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
-			var deleteQuery = generator.GenerateDeleteQuery<Heap>();
+			var deleteQuery = generator.GenerateDeleteQuery<HeapEntity>();
 
 			// Assert
 			Assert.Equal($"DELETE FROM [dbo].[Users] OUTPUT [deleted].[Username], [deleted].[Password] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", deleteQuery);
@@ -151,7 +151,7 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
-			var insertQuery = generator.GenerateInsertQuery(new Heap());
+			var insertQuery = generator.GenerateInsertQuery(new HeapEntity());
 
 			// Assert
 			Assert.Equal($"INSERT INTO [dbo].[Users] ([Username], [Password]) OUTPUT [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password)", insertQuery);
@@ -166,7 +166,7 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
-			var selectQuery = generator.GenerateGetAllQuery<Heap>();
+			var selectQuery = generator.GenerateGetAllQuery<HeapEntity>();
 
 			// Assert
 			Assert.Equal($"SELECT [dbo].[Users].[Username], [dbo].[Users].[Password] FROM [dbo].[Users]", selectQuery);
@@ -233,7 +233,7 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act
-			var query = generator.GenerateGetQuery<Heap>();
+			var query = generator.GenerateGetQuery<HeapEntity>();
 
 			// Assert
 			Assert.Equal("SELECT [dbo].[Users].[Username], [dbo].[Users].[Password] FROM [dbo].[Users] WHERE [dbo].[Users].[Username] = @Username AND [dbo].[Users].[Password] = @Password", query);
@@ -288,7 +288,7 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 			var generator = new QueryGenerator("Users", "dbo");
 
 			// Act && Assert
-			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<Heap>());
+			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<HeapEntity>());
 		}
 
 		[Fact]
