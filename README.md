@@ -28,106 +28,106 @@ Also it currently only supports MS Sql, but feel free to branch it and create su
 In order to avoid building this library for a specific Dapper version, I've added an injection point for injecting the necessary Dapper extension methods into the repositories.
 To only do this once, I recommend you start by creating a class called DapperInjection:
 
-	using SqlMapper = Dapper.SqlMapper;
+    using SqlMapper = Dapper.SqlMapper;
 
-	namespace YourNameSpaceHere
-	{
-		public class DapperInjection<TEntity> : IDapperInjection<TEntity>
-		where TEntity : TableEntity
-		{
-			public static DapperInjection<TEntity> Instance { get; }
+    namespace YourNameSpaceHere
+    {
+        public class DapperInjection<TEntity> : IDapperInjection<TEntity>
+        where TEntity : TableEntity
+        {
+            public static DapperInjection<TEntity> Instance { get; }
 
-			static DapperInjection()
-			{
-				Instance = new DapperInjection<TEntity>();
-			}
+            static DapperInjection()
+            {
+                Instance = new DapperInjection<TEntity>();
+            }
 
-			private DapperInjection() // Singleton pattern
-			{
-			}
+            private DapperInjection() // Singleton pattern
+            {
+            }
 
-			public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
+            public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
 
-			public QuerySingleDelegate<TEntity> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TEntity>;
+            public QuerySingleDelegate<TEntity> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TEntity>;
 
-			public QueryDelegate<TEntity> Query => SqlMapper.Query<TEntity>;
+            public QueryDelegate<TEntity> Query => SqlMapper.Query<TEntity>;
 
-			public QuerySingleAsyncDelegate<TEntity> QuerySingleAsync => SqlMapper.QuerySingleAsync<TEntity>;
+            public QuerySingleAsyncDelegate<TEntity> QuerySingleAsync => SqlMapper.QuerySingleAsync<TEntity>;
 
-			public QuerySingleAsyncDelegate<TEntity> QuerySingleOrDefaultAsync => SqlMapper.QuerySingleOrDefaultAsync<TEntity>;
+            public QuerySingleAsyncDelegate<TEntity> QuerySingleOrDefaultAsync => SqlMapper.QuerySingleOrDefaultAsync<TEntity>;
 
-			public QueryAsyncDelegate<TEntity> QueryAsync => SqlMapper.QueryAsync<TEntity>;
-		}
-	}
+            public QueryAsyncDelegate<TEntity> QueryAsync => SqlMapper.QueryAsync<TEntity>;
+        }
+    }
 
 What's going on here is you're injecting delegates to the Dapper extension methods into the Repository library.
 
 Secondly I'd recommend creating a sort of "base repository" class for your project, which handles creating an IDbConnection etc. It could look something like this:
 
-	using System.Data;
-	using System.Data.SqlClient;
-	using Ckode.Dapper.Repository.Sql;
+    using System.Data;
+    using System.Data.SqlClient;
+    using Ckode.Dapper.Repository.Sql;
 
-	namespace YourNameSpaceHere
-	{
-		public abstract class BasePrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : PrimaryKeyRepository<TPrimaryKeyEntity, TEntity>
-		where TPrimaryKeyEntity : TableEntity
-		where TEntity : TPrimaryKeyEntity
-		{
-			protected override IDapperInjection<TEntity> DapperInjection => DapperInjection<TEntity>.Instance; // Using the Singleton we created above
+    namespace YourNameSpaceHere
+    {
+        public abstract class BasePrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : PrimaryKeyRepository<TPrimaryKeyEntity, TEntity>
+        where TPrimaryKeyEntity : TableEntity
+        where TEntity : TPrimaryKeyEntity
+        {
+            protected override IDapperInjection<TEntity> DapperInjection => DapperInjection<TEntity>.Instance; // Using the Singleton we created above
 
-			protected override IDbConnection CreateConnection()
-			{
-				return new SqlConnection("Your connection string"); // You probably shouldn't hardcode your connection strings, this is just an example
-			}
-		}
-	}
+            protected override IDbConnection CreateConnection()
+            {
+                return new SqlConnection("Your connection string"); // You probably shouldn't hardcode your connection strings, this is just an example
+            }
+        }
+    }
 
 The "base repository" we just created is for tables with a primary key. If you have any heap tables (tables without a primary key), you should create a similar "BaseHeapRepository" class inheriting HeapRepository.
 
 
 That's the prerequisites taken care of, now onto actually using these classes. For this example we're going to create a very basic UserRepository mapping to a "Users" table looking like this:
 
-	CREATE TABLE Users
-	(
-		UserID INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-		Username VARCHAR(50) NOT NULL,
-		Password VARCHAR(50) NOT NULL, // Don't store passwords in plain text please, this is just for illustration purposes
-		Description VARCHAR(MAX) NULL,
-		DateCreated DATETIME() NOT NULL DEFAULT(GETDATE())
-	)
+    CREATE TABLE Users
+    (
+        UserID INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+        Username VARCHAR(50) NOT NULL,
+        Password VARCHAR(50) NOT NULL, // Don't store passwords in plain text please, this is just for illustration purposes
+        Description VARCHAR(MAX) NULL,
+        DateCreated DATETIME() NOT NULL DEFAULT(GETDATE())
+    )
 
 
 Now in order to have some nice method overloads, we're actually splitting the entity class into two, using inheritance along the way. We're also using the type "record" instead of "class". This is because it simplifies making entities immutable and creating new instances with the changes you want. Immutability allows for some very aggressive memory caching, because the entities become (at least somewhat) thread-safe.
 
 Our UserEntity.cs file would therefore look like this:
 
-	using System;
-	using Ckode.Dapper.Repository.Attributes;
+    using System;
+    using Ckode.Dapper.Repository.Attributes;
 
-	namespace YourNameSpaceHere
-	{
-		public record UserPrimaryKeyEntity : TableEntity
-		{
-			[PrimaryKeyColumn(isIdentity: true)]
-			public int Id { get; init; }
-		}
+    namespace YourNameSpaceHere
+    {
+        public record UserPrimaryKeyEntity : TableEntity
+        {
+            [PrimaryKeyColumn(isIdentity: true)]
+            public int Id { get; init; }
+        }
 
-		public record UserEntity : UserPrimaryKeyEntity
-		{
-			[Column]
-			public string Username { get; init; }
+        public record UserEntity : UserPrimaryKeyEntity
+        {
+            [Column]
+            public string Username { get; init; }
 
-			[Column]
-			public string Password { get; init; }
+            [Column]
+            public string Password { get; init; }
 
-			[Column]
-			public string? Description { get; init; }
+            [Column]
+            public string? Description { get; init; }
 
-			[Column(hasDefaultConstraint: true)] // Marked with "hasDefaultConstraint", as the table does indeed have DEFAULT(GETDATE()) on this column
-			public DateTime DateCreated { get; } // No init as I want this property completely read-only in .Net, it's only ever set once by the SQL server
-		}
-	}
+            [Column(hasDefaultConstraint: true)] // Marked with "hasDefaultConstraint", as the table does indeed have DEFAULT(GETDATE()) on this column
+            public DateTime DateCreated { get; } // No init as I want this property completely read-only in .Net, it's only ever set once by the SQL server
+        }
+    }
 
 You'll notice I've enabled nullable in this case, and I'm marking Description as string?. If you're not working with nullable just remove the ?.
 Also this example WILL currently generate compiler warnings about the properties Username, Password and DateCreated because they're not nullable and no constructor ensures they have a value. I'm currently working on figuring out how to remove these.
@@ -137,13 +137,13 @@ Rather than having to supply a full UserEntity instance as parameter to them, yo
 
 The final part is defining your repository, this in turn requires very little code as most of the functionality is built-in:
 
-	namespace YourNameSpaceHere
-	{
-		public class UserRepository : BasePrimaryKeyRepository<UserPrimaryKeyEntity, UserEntity>
-		{
-			protected override string TableName => "Users";
-		}
-	}
+    namespace YourNameSpaceHere
+    {
+        public class UserRepository : BasePrimaryKeyRepository<UserPrimaryKeyEntity, UserEntity>
+        {
+            protected override string TableName => "Users";
+        }
+    }
 
 Quite easy that one huh? :-)
 
@@ -160,10 +160,10 @@ Furthermore you're getting all the properties from the record you've just delete
 
 Should you want to add custom queries to your repository, it has a bunch of the Dapper extensions built-in for you to call, they create a connection themselves so it's as simple as:
 
-	public IEnumerable<UserEntity> GetUsersWithoutDescription()
-	{
-		return Query($"SELECT * FROM {FormattedTableName} WHERE Description IS NULL");
-	}
+    public IEnumerable<UserEntity> GetUsersWithoutDescription()
+    {
+        return Query($"SELECT * FROM {FormattedTableName} WHERE Description IS NULL");
+    }
 
 Notice the {FormattedTableName} there, that's a property which contains the proper Schema and TableName correctly formatted. By using this rather than typing out the name yourself, it'll be easier for you if you ever rename the table or move it to a different Schema.
 
