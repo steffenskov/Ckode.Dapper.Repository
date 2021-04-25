@@ -127,7 +127,7 @@ Our UserEntity.cs file would therefore look like this:
 You'll notice I've enabled nullable in the project in this case, and I'm marking Description as string?. If you're not working with nullable just remove the ?, and the " = default!;" too.
 
 The " = default!;" part is basically here to suppress warning *CS8616: Non-nullable property 'Username' must contain a non-null value when exiting constructor. Consider declaring the property as nullable.*
-What this does, is it set the property to null, and adds the "null-forgiving operator !" to tell the compiler to stop complaining.
+What this does, is it sets the property to null, and adds the "null-forgiving operator !" to tell the compiler to stop complaining.
 
 This is ok here, because we're either getting entities from the SQL server, in which case the properties won't be null, or creating a full instance to insert, in which case it also won't be null.
 
