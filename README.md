@@ -25,7 +25,7 @@ Also it currently only supports MS Sql, but feel free to branch it and create su
 
 ## Usage:
 
-In order to avoid building this library for a specific Dapper version, I've added an injection point for injecting the necessary Dapper extension methods into the repositories.
+In order to avoid building this library for a specific Dapper version, I've added an injection point for injecting the necessary Dapper extension methods into the repositories.  
 To only do this once, I recommend you start by creating a class called DapperInjection:
 
     using SqlMapper = Dapper.SqlMapper;
@@ -124,9 +124,8 @@ Our UserEntity.cs file would therefore look like this:
         }
     }
 
-You'll notice I've enabled nullable in the project in this case, and I'm marking Description as string?. If you're not working with nullable just remove the ?, and the " = default!;" too.
-
-The " = default!;" part is basically here to suppress warning *CS8616: Non-nullable property 'Username' must contain a non-null value when exiting constructor. Consider declaring the property as nullable.*
+You'll notice I've enabled nullable in the project in this case, and I'm marking Description as string?. If you're not working with nullable just remove the ?, and the " = default!;" too.  
+The " = default!;" part is basically here to suppress warning *CS8616: Non-nullable property 'Username' must contain a non-null value when exiting constructor. Consider declaring the property as nullable.*  
 What this does, is it sets the property to null, and adds the "null-forgiving operator !" to tell the compiler to stop complaining.
 
 This is ok here, because we're either getting entities from the SQL server, in which case the properties won't be null, or creating a full instance to insert, in which case it also won't be null.
@@ -155,9 +154,9 @@ The UserRepository now gives you access to the following built-in methods:
 - IEnumerable<UserEntity> GetAll()
 - UserEntity Update(UserEntity entity)
 
-All of which have an Async variant as well. You'll notice all methods, including Delete, return an instance of UserEntity. This is because whatever data you've just manipulated using Delete, Insert or Update is returned to you as an instance.
-In our case this means the result from Insert will actually contain the DateCreated value the database generated itself.
-Furthermore you're getting all the properties from the record you've just deleted, which can be quite handy for cache invalidation.
+All of which have an Async variant as well. You'll notice all methods, including Delete, return an instance of UserEntity. This is because whatever data you've just manipulated using Delete, Insert or Update is returned to you as an instance.  
+In our case this means the result from Insert will actually contain the DateCreated value the database generated itself.  
+Furthermore for deletions you're getting all the properties from the record you've just deleted, which can be quite handy for cache invalidation.
 
 Should you want to add custom queries to your repository, it has a bunch of the Dapper extensions built-in for you to call, they create a connection themselves so it's as simple as:
 
