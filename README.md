@@ -3,7 +3,7 @@ This is an extension library for the Dapper ORM, giving you simple-to-use reposi
 
 ## Installation:
 
-I recommend using the NuGet package: https://www.nuget.org/packages/Ckode.ServiceLocator/ however you can also simply clone the repository and compile the project yourself.
+I recommend using the NuGet package: https://www.nuget.org/packages/Ckode.Dapper.Repository/ however you can also simply clone the repository and compile the project yourself.
 
 As the project is licensed under MIT you're free to use it for pretty much anything you want.
 
@@ -33,19 +33,7 @@ To only do this once, I recommend you start by creating a class called DapperInj
     namespace YourNameSpaceHere
     {
         public class DapperInjection<TEntity> : IDapperInjection<TEntity>
-        where TEntity : TableEntity
         {
-            public static DapperInjection<TEntity> Instance { get; }
-
-            static DapperInjection()
-            {
-                Instance = new DapperInjection<TEntity>();
-            }
-
-            private DapperInjection() // Singleton pattern
-            {
-            }
-
             public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
 
             public QuerySingleDelegate<TEntity> QuerySingleOrDefault => SqlMapper.QuerySingleOrDefault<TEntity>;
@@ -57,6 +45,10 @@ To only do this once, I recommend you start by creating a class called DapperInj
             public QuerySingleAsyncDelegate<TEntity> QuerySingleOrDefaultAsync => SqlMapper.QuerySingleOrDefaultAsync<TEntity>;
 
             public QueryAsyncDelegate<TEntity> QueryAsync => SqlMapper.QueryAsync<TEntity>;
+
+            public ExecuteDelegate Execute => SqlMapper.Execute;
+
+            public ExecuteAsyncDelegate ExecuteAsync => SqlMapper.ExecuteAsync;
         }
     }
 
@@ -74,11 +66,14 @@ Secondly I'd recommend creating a sort of "base repository" class for your proje
         where TPrimaryKeyEntity : TableEntity
         where TEntity : TPrimaryKeyEntity
         {
-            protected override IDapperInjection<TEntity> DapperInjection => DapperInjection<TEntity>.Instance; // Using the Singleton we created above
-
             protected override IDbConnection CreateConnection()
             {
                 return new SqlConnection("Your connection string"); // You probably shouldn't hardcode your connection strings, this is just an example
+            }
+
+            protected override IDapperInjection<T> CreateDapperInjection<T>()
+            {
+                return new DapperInjection<T>();
             }
         }
     }
@@ -165,7 +160,7 @@ Should you want to add custom queries to your repository, it has a bunch of the 
         return Query($"SELECT * FROM {FormattedTableName} WHERE Description IS NULL");
     }
 
-Notice the {FormattedTableName} there, that's a property which contains the proper Schema and TableName correctly formatted. By using this rather than typing out the name yourself, it'll be easier for you if you ever rename the table or move it to a different Schema.
+Notice the {FormattedTableName} there, that's a read-only property which contains the proper Schema and TableName correctly formatted. By using this rather than typing out the name yourself, it'll be easier for you if you ever rename the table or move it to a different Schema.
 
 
 One finally notice: I'd highly recommend checking out the different parameters you can assign to [Column] and [PrimaryKey], as well as checking out what properties can be overridden in your BasePrimaryKeyRepository and which methods it already has for you to use. This should give you further insight into how the library works.
