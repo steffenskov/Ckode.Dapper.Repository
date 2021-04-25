@@ -8,7 +8,10 @@ using Ckode.Dapper.Repository.MetaInformation;
 
 namespace Ckode.Dapper.Repository.Sql
 {
-	public abstract class PrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : IRepository<TPrimaryKeyEntity, TEntity>
+	/// <summary>
+	/// Provides a repository for tables with a primary key defined (either single column or composite)
+	/// </summary>
+	public abstract class PrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : BaseRepository<TEntity>, IRepository<TPrimaryKeyEntity, TEntity>
 		where TPrimaryKeyEntity : TableEntity
 		where TEntity : TPrimaryKeyEntity
 	{
@@ -21,31 +24,17 @@ namespace Ckode.Dapper.Repository.Sql
 			_resultChecker = new QueryResultChecker<TPrimaryKeyEntity, TEntity>();
 		}
 
-		protected abstract string TableName { get; }
-
-		protected string Schema => "dbo";
-
-		protected string FormattedTableName => $"[{Schema}].[{TableName}]";
-
-		protected abstract IDbConnection CreateConnection();
-
-		#region Injection points for Dapper methods
-
-		protected abstract IDapperInjection<TEntity> DapperInjection { get; }
-
-		#endregion
-
 		#region Delete
 		public TEntity Delete(TPrimaryKeyEntity entity)
 		{
-			return DeleteInternalAsync(entity, (pk, query) => Task.FromResult(ExecuteQuerySingleOrDefault(pk, query)))
+			return DeleteInternalAsync(entity, (pk, query) => Task.FromResult(QuerySingleOrDefault(query, pk)))
 					.GetAwaiter()
 					.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
 		}
 
 		public async Task<TEntity> DeleteAsync(TPrimaryKeyEntity entity)
 		{
-			return await DeleteInternalAsync(entity, async (pk, query) => await ExecuteQuerySingleOrDefaultAsync(pk, query));
+			return await DeleteInternalAsync(entity, async (pk, query) => await QuerySingleOrDefaultAsync(query, pk));
 		}
 
 		private async Task<TEntity> DeleteInternalAsync(TPrimaryKeyEntity entity, Func<TPrimaryKeyEntity, string, Task<TEntity?>> execute)
@@ -69,14 +58,14 @@ namespace Ckode.Dapper.Repository.Sql
 		#region Get
 		public TEntity Get(TPrimaryKeyEntity entity)
 		{
-			return GetInternal(entity, (pk, query) => Task.FromResult(ExecuteQuerySingleOrDefault(pk, query)))
+			return GetInternal(entity, (pk, query) => Task.FromResult(QuerySingleOrDefault(query, pk)))
 					.GetAwaiter()
 					.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
 		}
 
 		public async Task<TEntity> GetAsync(TPrimaryKeyEntity entity)
 		{
-			return await GetInternal(entity, async (pk, query) => await ExecuteQuerySingleOrDefaultAsync(pk, query));
+			return await GetInternal(entity, async (pk, query) => await QuerySingleOrDefaultAsync(query, pk));
 		}
 
 		private async Task<TEntity> GetInternal(TPrimaryKeyEntity entity, Func<TPrimaryKeyEntity, string, Task<TEntity?>> execute)
@@ -100,38 +89,37 @@ namespace Ckode.Dapper.Repository.Sql
 		#region GetAll
 		public IEnumerable<TEntity> GetAll()
 		{
-			return GetAllInternalAsync((connection, query) => Task.FromResult(DapperInjection.Query.Invoke(connection, query)))
+			return GetAllInternalAsync((query) => Task.FromResult(Query(query)))
 						.GetAwaiter()
 						.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
 		}
 
 		public async Task<IEnumerable<TEntity>> GetAllAsync()
 		{
-			return await GetAllInternalAsync(async (connection, query) => await DapperInjection.QueryAsync.Invoke(connection, query));
+			return await GetAllInternalAsync(async (query) => await QueryAsync(query));
 		}
 
-		private async Task<IEnumerable<TEntity>> GetAllInternalAsync(Func<IDbConnection, string, Task<IEnumerable<TEntity>>> execute)
+		private async Task<IEnumerable<TEntity>> GetAllInternalAsync(Func<string, Task<IEnumerable<TEntity>>> execute)
 		{
 			var query = _queryGenerator.GenerateGetAllQuery<TEntity>();
-			using var connection = CreateConnection();
-			return await execute(connection, query);
+			return await execute(query);
 		}
 		#endregion
 
 		#region Insert
 		public TEntity Insert(TEntity entity)
 		{
-			return InsertInternalAsync(entity, (connection, query, input) => Task.FromResult(DapperInjection.QuerySingle.Invoke(connection, query, input)))
+			return InsertInternalAsync(entity, (query, input) => Task.FromResult(QuerySingle(query, input)))
 					.GetAwaiter()
 					.GetResult();
 		}
 
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
-			return await InsertInternalAsync(entity, async (connection, query, input) => await DapperInjection.QuerySingleAsync.Invoke(connection, query, input));
+			return await InsertInternalAsync(entity, async (query, input) => await QuerySingleAsync(query, input));
 		}
 
-		private async Task<TEntity> InsertInternalAsync(TEntity entity, Func<IDbConnection, string, TEntity, Task<TEntity>> execute)
+		private async Task<TEntity> InsertInternalAsync(TEntity entity, Func<string, TEntity, Task<TEntity>> execute)
 		{
 			if (entity == null)
 			{
@@ -150,22 +138,21 @@ namespace Ckode.Dapper.Repository.Sql
 			}
 
 			var query = _queryGenerator.GenerateInsertQuery(entity);
-			using var connection = CreateConnection();
-			return await execute(connection, query, entity);
+			return await execute(query, entity);
 		}
 		#endregion
 
 		#region Update
 		public TEntity Update(TEntity entity)
 		{
-			return UpdateInternalAsync(entity, (input, query) => Task.FromResult(ExecuteQuerySingleOrDefault(input, query)))
+			return UpdateInternalAsync(entity, (input, query) => Task.FromResult(QuerySingleOrDefault(query, input)))
 						.GetAwaiter()
 						.GetResult();
 		}
 
 		public async Task<TEntity> UpdateAsync(TEntity entity)
 		{
-			return await UpdateInternalAsync(entity, async (input, query) => await ExecuteQuerySingleOrDefaultAsync(input, query));
+			return await UpdateInternalAsync(entity, async (input, query) => await QuerySingleOrDefaultAsync(query, input));
 		}
 
 		private async Task<TEntity> UpdateInternalAsync(TEntity entity, Func<TEntity, string, Task<TEntity?>> execute)
@@ -196,18 +183,6 @@ namespace Ckode.Dapper.Repository.Sql
 			{
 				throw new ArgumentException($"entity has the following primary keys which have default values: {string.Join(", ", invalidPrimaryKeys.Select(col => col.Name))}", nameof(entity));
 			}
-		}
-
-		private TEntity? ExecuteQuerySingleOrDefault(TPrimaryKeyEntity entity, string query)
-		{
-			using var connection = CreateConnection();
-			return DapperInjection.QuerySingleOrDefault.Invoke(connection, query, entity);
-		}
-
-		private async Task<TEntity?> ExecuteQuerySingleOrDefaultAsync(TPrimaryKeyEntity entity, string query)
-		{
-			using var connection = CreateConnection();
-			return await DapperInjection.QuerySingleOrDefaultAsync.Invoke(connection, query, entity);
 		}
 	}
 }
