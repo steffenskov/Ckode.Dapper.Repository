@@ -7,7 +7,7 @@ namespace Ckode.Dapper.Repository.Sql
 	/// <summary>
 	/// Base repository, don't inherit this class, but rather use PrimaryKeyRepository or HeapRepository.
 	/// </summary>
-	public abstract class BaseRepository<TEntity>
+	public abstract class DbRepository<TEntity>
 	where TEntity : TableEntity
 	{
 		protected abstract string TableName { get; }
@@ -22,7 +22,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 		private readonly IDapperInjection<TEntity> _dapperInjection;
 
-		public BaseRepository()
+		public DbRepository()
 		{
 			_dapperInjection = CreateDapperInjection<TEntity>();
 		}

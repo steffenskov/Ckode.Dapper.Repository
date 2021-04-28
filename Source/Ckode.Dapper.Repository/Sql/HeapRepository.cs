@@ -10,7 +10,7 @@ namespace Ckode.Dapper.Repository.Sql
 	/// <summary>
 	/// Provides a repository for "heap" tables (tables without a primary key)
 	/// </summary>
-	public abstract class HeapRepository<TEntity> : BaseRepository<TEntity>, IHeapRepository<TEntity>
+	public abstract class HeapRepository<TEntity> : DbRepository<TEntity>, IHeapRepository<TEntity>
 	where TEntity : TableEntity
 	{
 
