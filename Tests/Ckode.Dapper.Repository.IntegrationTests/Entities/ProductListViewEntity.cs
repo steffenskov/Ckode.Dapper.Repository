@@ -2,7 +2,7 @@ using Ckode.Dapper.Repository.Attributes;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Entities
 {
-	public record ProductListViewEntity : DapperEntity
+	public record ProductListViewEntity : DbEntity
 	{
 		[Column]
 		public int ProductID { get; }

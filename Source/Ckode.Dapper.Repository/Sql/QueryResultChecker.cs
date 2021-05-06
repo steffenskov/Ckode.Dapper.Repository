@@ -7,7 +7,7 @@ using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 namespace Ckode.Dapper.Repository.Sql
 {
 	internal class QueryResultChecker<TPrimaryKeyEntity, TEntity>
-	where TPrimaryKeyEntity : DapperEntity
+	where TPrimaryKeyEntity : DbEntity
 	where TEntity : TPrimaryKeyEntity
 	{
 		public TEntity ReturnOrThrowIfEntityIsNull(TPrimaryKeyEntity entity, EntityInformation info, TEntity? result, string query)

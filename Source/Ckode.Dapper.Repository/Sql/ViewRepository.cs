@@ -6,7 +6,7 @@ using Ckode.Dapper.Repository.Interfaces;
 namespace Ckode.Dapper.Repository.Sql
 {
 	public abstract class ViewRepository<TEntity> : DbRepository<TEntity>, IViewRepository<TEntity>
-	where TEntity : DapperEntity
+	where TEntity : DbEntity
 	{
 		protected abstract string ViewName { get; }
 

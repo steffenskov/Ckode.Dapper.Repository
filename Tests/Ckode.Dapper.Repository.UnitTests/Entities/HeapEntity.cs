@@ -2,7 +2,7 @@
 
 namespace Ckode.Dapper.Repository.Tests.Entities
 {
-	public record HeapEntity : DapperEntity
+	public record HeapEntity : DbEntity
 	{
 		[Column]
 		public string Username { get; init; } = default!;

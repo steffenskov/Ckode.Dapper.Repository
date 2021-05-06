@@ -8,7 +8,7 @@ namespace Ckode.Dapper.Repository.Sql
 	/// Base repository, don't inherit this class, but rather use PrimaryKeyRepository or HeapRepository.
 	/// </summary>
 	public abstract class DbRepository<TEntity>
-	where TEntity : DapperEntity
+	where TEntity : DbEntity
 	{
 		protected string Schema => "dbo";
 

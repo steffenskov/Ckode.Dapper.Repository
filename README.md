@@ -64,7 +64,7 @@ Secondly I'd recommend creating a sort of "base repository" class for your proje
     namespace YourNameSpaceHere
     {
         public abstract class BasePrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : PrimaryKeyRepository<TPrimaryKeyEntity, TEntity>
-        where TPrimaryKeyEntity : TableEntity
+        where TPrimaryKeyEntity : DbEntity
         where TEntity : TPrimaryKeyEntity
         {
             protected override IDbConnection CreateConnection()
@@ -103,7 +103,7 @@ Our UserEntity.cs file would therefore look like this:
 
     namespace YourNameSpaceHere
     {
-        public record UserPrimaryKeyEntity : TableEntity
+        public record UserPrimaryKeyEntity : DbEntity
         {
             [PrimaryKeyColumn(isIdentity: true)]
             public int Id { get; init; }

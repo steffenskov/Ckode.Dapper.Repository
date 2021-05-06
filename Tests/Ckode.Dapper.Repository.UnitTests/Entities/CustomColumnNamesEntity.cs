@@ -3,7 +3,7 @@ using Ckode.Dapper.Repository.Attributes;
 
 namespace Ckode.Dapper.Repository.Tests.Entities
 {
-	public record CustomColumnNamesEntity : DapperEntity
+	public record CustomColumnNamesEntity : DbEntity
 	{
 		[PrimaryKeyColumn(isIdentity: true, columnName: "OrderId")]
 		public int Id { get; init; }

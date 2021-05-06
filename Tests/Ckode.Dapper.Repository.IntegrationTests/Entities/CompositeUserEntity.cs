@@ -3,7 +3,7 @@ using Ckode.Dapper.Repository.Attributes;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Entities
 {
-	public record CompositeUserPrimaryKeyEntity : DapperEntity
+	public record CompositeUserPrimaryKeyEntity : DbEntity
 	{
 		[PrimaryKeyColumn(isIdentity: false)]
 		public string Username { get; init; } = default!;
