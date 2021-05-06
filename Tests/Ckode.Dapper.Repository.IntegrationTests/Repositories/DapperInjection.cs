@@ -2,7 +2,7 @@ using SqlMapper = Dapper.SqlMapper;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
 {
-	public class DapperInjection<TEntity> : IDapperInjection<TEntity>
+	internal class DapperInjection<TEntity> : IDapperInjection<TEntity>
 	{
 		public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
 

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Ckode.Dapper.Repository.Interfaces
 {
 	public interface IHeapRepository<TEntity>
-	where TEntity : TableEntity
+	where TEntity : DapperEntity
 	{
 		TEntity Delete(TEntity entity);
 		Task<TEntity> DeleteAsync(TEntity entity);

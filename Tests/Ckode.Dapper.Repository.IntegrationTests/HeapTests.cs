@@ -92,15 +92,23 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity { Username = "async My name1", Password = "My secret" };
+			var entity = new UserHeapEntity { Username = "Some name", Password = "My secret" };
+			var entity2 = new UserHeapEntity { Username = "Some other name", Password = "My secret" };
 			repository.Insert(entity);
+			repository.Insert(entity2);
 
 			// Act
-			var deletedEntity = repository.Delete(entity);
+			var all = repository.GetAll();
 
-			// Assert
-			Assert.Equal(entity.Username, deletedEntity.Username);
-			Assert.Equal(entity.Password, deletedEntity.Password);
+			try
+			{
+				Assert.True(all.Count() >= 2);
+			}
+			finally
+			{
+				repository.Delete(entity);
+				repository.Delete(entity2);
+			}
 		}
 
 		[Fact]

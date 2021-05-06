@@ -3,7 +3,7 @@ using Ckode.Dapper.Repository.Attributes;
 
 namespace Ckode.Dapper.Repository.Tests.Entities
 {
-	public record HasDefaultConstraintEntity : TableEntity
+	public record HasDefaultConstraintEntity : DapperEntity
 	{
 		[PrimaryKeyColumn]
 		public int Id { get; init; }

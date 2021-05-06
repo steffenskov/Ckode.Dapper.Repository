@@ -11,10 +11,14 @@ namespace Ckode.Dapper.Repository.Sql
 	/// Provides a repository for "heap" tables (tables without a primary key)
 	/// </summary>
 	public abstract class HeapRepository<TEntity> : DbRepository<TEntity>, IHeapRepository<TEntity>
-	where TEntity : TableEntity
+	where TEntity : DapperEntity
 	{
+		protected abstract string TableName { get; }
+
+		protected string FormattedTableName => $"[{Schema}].[{TableName}]";
 
 		private readonly QueryGenerator _queryGenerator;
+
 		private readonly QueryResultChecker<TEntity, TEntity> _resultChecker;
 
 		public HeapRepository()
@@ -22,7 +26,6 @@ namespace Ckode.Dapper.Repository.Sql
 			_queryGenerator = new QueryGenerator(TableName, Schema);
 			_resultChecker = new QueryResultChecker<TEntity, TEntity>();
 		}
-
 
 		#region Delete
 		public TEntity Delete(TEntity entity)

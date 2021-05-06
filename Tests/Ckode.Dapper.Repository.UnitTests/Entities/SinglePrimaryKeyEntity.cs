@@ -2,7 +2,7 @@
 
 namespace Ckode.Dapper.Repository.Tests.Entities
 {
-	public record SinglePrimaryKeyEntity : TableEntity
+	public record SinglePrimaryKeyEntity : DapperEntity
 	{
 		[PrimaryKeyColumn(isIdentity: true)]
 		public int Id { get; init; }

@@ -3,7 +3,7 @@ using Ckode.Dapper.Repository.Attributes;
 
 namespace Ckode.Dapper.Repository.Tests.Entities
 {
-	public record AllColumnsHasMissingSetterEntity : TableEntity
+	public record AllColumnsHasMissingSetterEntity : DapperEntity
 	{
 		[PrimaryKeyColumn]
 		public int Id { get; init; }
