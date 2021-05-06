@@ -28,8 +28,9 @@ Also it currently only supports MS Sql, but feel free to branch it and create su
 In order to avoid building this library for a specific Dapper version, I've added an injection point for injecting the necessary Dapper extension methods into the repositories.  
 To only do this once, I recommend you start by creating a class called DapperInjection:
 
+    using Ckode.Dapper.Repository;
     using SqlMapper = Dapper.SqlMapper;
-
+    
     namespace YourNameSpaceHere
     {
         public class DapperInjection<TEntity> : IDapperInjection<TEntity>
