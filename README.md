@@ -33,7 +33,7 @@ To only do this once, I recommend you start by creating a class called DapperInj
     
     namespace YourNameSpaceHere
     {
-        public class DapperInjection<TEntity> : IDapperInjection<TEntity>
+        internal class DapperInjection<TEntity> : IDapperInjection<TEntity>
         {
             public QuerySingleDelegate<TEntity> QuerySingle => SqlMapper.QuerySingle<TEntity>;
 
