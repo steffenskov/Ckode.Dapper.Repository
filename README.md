@@ -21,6 +21,7 @@ Also it currently only supports MS Sql, but feel free to branch it and create su
 
 - Repository for aggregates, like e.g. an Order entity with an IList\<OrderLine\> property containing all the orderlines for the order. The idea is you can just call any CRUD method on the repository with an aggregate, and it'll figure out foreign keys etc. for you to ensure everything is inserted/updated/deleted/retrieved in the proper order. Kind of like what Entity Framework does, just better :-P
 - Built-in caching with automatic cache invalidation
+- Option to hook up custom logic pre-/post Insert/Update/Delete on repositories.
 
 
 ## Usage:
