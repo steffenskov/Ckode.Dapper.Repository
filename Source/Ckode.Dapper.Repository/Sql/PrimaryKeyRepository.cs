@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Ckode.Dapper.Repository.Delegates;
+using Ckode.Dapper.Repository.Exceptions;
 using Ckode.Dapper.Repository.Interfaces;
 using Ckode.Dapper.Repository.MetaInformation;
 
@@ -23,6 +26,15 @@ namespace Ckode.Dapper.Repository.Sql
 
 		private readonly QueryResultChecker<TPrimaryKeyEntity, TEntity> _resultChecker;
 
+		#region Events
+		public event PreOperationDelegate<TEntity>? PreInsert;
+		public event PostOperationDelegate<TEntity>? PostInsert;
+		public event PreOperationDelegate<TPrimaryKeyEntity>? PreDelete;
+		public event PostOperationDelegate<TEntity>? PostDelete;
+		public event PreOperationDelegate<TEntity>? PreUpdate;
+		public event PostOperationDelegate<TEntity>? PostUpdate;
+		#endregion
+
 		public PrimaryKeyRepository()
 		{
 			_queryGenerator = new QueryGenerator(TableName, Schema);
@@ -32,14 +44,21 @@ namespace Ckode.Dapper.Repository.Sql
 		#region Delete
 		public TEntity Delete(TPrimaryKeyEntity entity)
 		{
-			return DeleteInternalAsync(entity, (pk, query) => Task.FromResult(QuerySingleOrDefault(query, pk)))
-					.GetAwaiter()
-					.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+			InvokePreOperation(PreDelete, entity);
+
+			var result = DeleteInternalAsync(entity, (pk, query) => Task.FromResult(QuerySingleOrDefault(query, pk)))
+							.GetAwaiter()
+							.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+			InvokePostOperation(PostDelete, result);
+			return result;
 		}
 
 		public async Task<TEntity> DeleteAsync(TPrimaryKeyEntity entity)
 		{
-			return await DeleteInternalAsync(entity, async (pk, query) => await QuerySingleOrDefaultAsync(query, pk));
+			InvokePreOperation(PreDelete, entity);
+			var result = await DeleteInternalAsync(entity, async (pk, query) => await QuerySingleOrDefaultAsync(query, pk));
+			InvokePostOperation(PostDelete, result);
+			return result;
 		}
 
 		private async Task<TEntity> DeleteInternalAsync(TPrimaryKeyEntity entity, Func<TPrimaryKeyEntity, string, Task<TEntity?>> execute)
@@ -114,14 +133,20 @@ namespace Ckode.Dapper.Repository.Sql
 		#region Insert
 		public TEntity Insert(TEntity entity)
 		{
-			return InsertInternalAsync(entity, (query, input) => Task.FromResult(QuerySingle(query, input)))
-					.GetAwaiter()
-					.GetResult();
+			InvokePreOperation(PreInsert, entity);
+			var result = InsertInternalAsync(entity, (query, input) => Task.FromResult(QuerySingle(query, input)))
+							.GetAwaiter()
+							.GetResult();
+			InvokePostOperation(PostInsert, result);
+			return result;
 		}
 
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
-			return await InsertInternalAsync(entity, async (query, input) => await QuerySingleAsync(query, input));
+			InvokePreOperation(PreInsert, entity);
+			var result = await InsertInternalAsync(entity, async (query, input) => await QuerySingleAsync(query, input));
+			InvokePostOperation(PostInsert, result);
+			return result;
 		}
 
 		private async Task<TEntity> InsertInternalAsync(TEntity entity, Func<string, TEntity, Task<TEntity>> execute)
@@ -150,14 +175,20 @@ namespace Ckode.Dapper.Repository.Sql
 		#region Update
 		public TEntity Update(TEntity entity)
 		{
-			return UpdateInternalAsync(entity, (input, query) => Task.FromResult(QuerySingleOrDefault(query, input)))
-						.GetAwaiter()
-						.GetResult();
+			InvokePreOperation(PreUpdate, entity);
+			var result = UpdateInternalAsync(entity, (input, query) => Task.FromResult(QuerySingleOrDefault(query, input)))
+							.GetAwaiter()
+							.GetResult();
+			InvokePostOperation(PostUpdate, result);
+			return result;
 		}
 
 		public async Task<TEntity> UpdateAsync(TEntity entity)
 		{
-			return await UpdateInternalAsync(entity, async (input, query) => await QuerySingleOrDefaultAsync(query, input));
+			InvokePreOperation(PreUpdate, entity);
+			var result = await UpdateInternalAsync(entity, async (input, query) => await QuerySingleOrDefaultAsync(query, input));
+			InvokePostOperation(PostUpdate, result);
+			return result;
 		}
 
 		private async Task<TEntity> UpdateInternalAsync(TEntity entity, Func<TEntity, string, Task<TEntity?>> execute)
@@ -178,6 +209,32 @@ namespace Ckode.Dapper.Repository.Sql
 		}
 		#endregion
 
+		#region Event invokation
+		protected void InvokePreOperation<T>(PreOperationDelegate<T>? @delegate, T entity)
+		where T : TPrimaryKeyEntity
+		{
+			var cancelArg = new CancelEventArgs();
+			try
+			{
+				@delegate?.Invoke(entity, cancelArg);
+			}
+			catch { }
+			if (cancelArg.Cancel)
+			{
+				throw new CanceledException("Cancelled by event");
+			}
+		}
+
+		protected void InvokePostOperation(PostOperationDelegate<TEntity>? @delegate, TEntity entity)
+		{
+			try
+			{
+				@delegate?.Invoke(entity);
+			}
+			catch { }
+		}
+		#endregion
+
 		private static void CheckForDefaultPrimaryKeys(EntityInformation info, TPrimaryKeyEntity entity)
 		{
 			var invalidPrimaryKeys = info.PrimaryKeys
@@ -189,5 +246,6 @@ namespace Ckode.Dapper.Repository.Sql
 				throw new ArgumentException($"entity has the following primary keys which have default values: {string.Join(", ", invalidPrimaryKeys.Select(col => col.Name))}", nameof(entity));
 			}
 		}
+
 	}
 }

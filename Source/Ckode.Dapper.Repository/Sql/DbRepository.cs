@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace Ckode.Dapper.Repository.Sql
 		protected abstract IDapperInjection<T> CreateDapperInjection<T>();
 
 		private readonly IDapperInjection<TEntity> _dapperInjection;
+
 
 		protected DbRepository()
 		{

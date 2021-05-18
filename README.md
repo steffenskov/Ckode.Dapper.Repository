@@ -21,7 +21,6 @@ Also it currently only supports MS Sql, but feel free to branch it and create su
 
 - Repository for aggregates, like e.g. an Order entity with an IList\<OrderLine\> property containing all the orderlines for the order. The idea is you can just call any CRUD method on the repository with an aggregate, and it'll figure out foreign keys etc. for you to ensure everything is inserted/updated/deleted/retrieved in the proper order. Kind of like what Entity Framework does, just better :-P
 - Built-in caching with automatic cache invalidation
-- Option to hook up custom logic pre-/post Insert/Update/Delete on repositories.
 
 
 ## Usage:
@@ -168,6 +167,25 @@ Should you want to add custom queries to your repository, it has a bunch of the 
     }
 
 Notice the {FormattedTableName} there, that's a read-only property which contains the proper Schema and TableName correctly formatted. By using this rather than typing out the name yourself, it'll be easier for you if you ever rename the table or move it to a different Schema.
+
+
+Furthermore the PrimaryKey based repository has these public (non-static!) events:
+- PreDelete
+- PostDelete
+- PreInsert
+- PostInsert
+- PreUpdate
+- PostUpdate
+
+The Heap based repository has the same events except for the Update ones, as there's no Update method here.
+
+
+The Pre- events all contain the entity you've passed as an argument to the respective method, as well as an CancelableEventArgs allowing any event handler to cancel the operation in question.
+If any listener cancels the event, an CanceledException is thrown by the method in question.
+
+The Post- events all contain the entity returned from the database, so for an insert any default constraint, identity columns etc. will have their values fresh from the DB.
+
+Finally all the events SWALLOW EXCEPTIONS, so any exception handling you want for custom code in an event handler you'll have to implement directly in your handler. This is to ensure no third party code breaks the DB operation.
 
 
 One finally notice: I'd highly recommend checking out the different parameters you can assign to [Column] and [PrimaryKey], as well as checking out what properties can be overridden in your BasePrimaryKeyRepository and which methods it already has for you to use. This should give you further insight into how the library works.

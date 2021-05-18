@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Ckode.Dapper.Repository.Delegates;
+using Ckode.Dapper.Repository.Exceptions;
 using Ckode.Dapper.Repository.Interfaces;
 using Ckode.Dapper.Repository.MetaInformation;
 
@@ -21,6 +24,14 @@ namespace Ckode.Dapper.Repository.Sql
 
 		private readonly QueryResultChecker<TEntity, TEntity> _resultChecker;
 
+		#region Events
+
+		public event PreOperationDelegate<TEntity>? PreInsert;
+		public event PostOperationDelegate<TEntity>? PostInsert;
+		public event PreOperationDelegate<TEntity>? PreDelete;
+		public event PostOperationDelegate<TEntity>? PostDelete;
+		#endregion
+
 		public HeapRepository()
 		{
 			_queryGenerator = new QueryGenerator(TableName, Schema);
@@ -30,14 +41,21 @@ namespace Ckode.Dapper.Repository.Sql
 		#region Delete
 		public TEntity Delete(TEntity entity)
 		{
-			return DeleteInternalAsync(entity, (query, input) => Task.FromResult(Query(query, input)))
-						.GetAwaiter()
-						.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+			InvokePreOperation(PreDelete, entity);
+			var result = DeleteInternalAsync(entity, (query, input) => Task.FromResult(Query(query, input)))
+							.GetAwaiter()
+							.GetResult(); // This is safe because we're using Task.FromResult as the only "async" part
+
+			InvokePostOperation(PostDelete, result);
+			return result;
 		}
 
 		public async Task<TEntity> DeleteAsync(TEntity entity)
 		{
-			return await DeleteInternalAsync(entity, async (query, input) => await QueryAsync(query, input));
+			InvokePreOperation(PreDelete, entity);
+			var result = await DeleteInternalAsync(entity, async (query, input) => await QueryAsync(query, input));
+			InvokePostOperation(PostDelete, result);
+			return result;
 		}
 
 		private async Task<TEntity> DeleteInternalAsync(TEntity entity, Func<string, TEntity, Task<IEnumerable<TEntity>>> execute)
@@ -108,14 +126,20 @@ namespace Ckode.Dapper.Repository.Sql
 		#region Insert
 		public TEntity Insert(TEntity entity)
 		{
-			return InsertInternalAsync(entity, (query, input) => Task.FromResult(QuerySingle(query, input)))
-					.GetAwaiter()
-					.GetResult();
+			InvokePreOperation(PreInsert, entity);
+			var result = InsertInternalAsync(entity, (query, input) => Task.FromResult(QuerySingle(query, input)))
+							.GetAwaiter()
+							.GetResult();
+			InvokePostOperation(PostInsert, result);
+			return result;
 		}
 
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
-			return await InsertInternalAsync(entity, async (query, input) => await QuerySingleAsync(query, input));
+			InvokePreOperation(PreInsert, entity);
+			var result = await InsertInternalAsync(entity, async (query, input) => await QuerySingleAsync(query, input));
+			InvokePostOperation(PostInsert, result);
+			return result;
 		}
 
 		private async Task<TEntity> InsertInternalAsync(TEntity entity, Func<string, TEntity, Task<TEntity>> execute)
@@ -129,6 +153,31 @@ namespace Ckode.Dapper.Repository.Sql
 			return await execute(query, entity);
 		}
 
+		#endregion
+
+		#region Event invokation
+		protected void InvokePreOperation(PreOperationDelegate<TEntity>? @delegate, TEntity entity)
+		{
+			var cancelArg = new CancelEventArgs();
+			try
+			{
+				@delegate?.Invoke(entity, cancelArg);
+			}
+			catch { }
+			if (cancelArg.Cancel)
+			{
+				throw new CanceledException("Cancelled by event");
+			}
+		}
+
+		protected void InvokePostOperation(PostOperationDelegate<TEntity>? @delegate, TEntity entity)
+		{
+			try
+			{
+				@delegate?.Invoke(entity);
+			}
+			catch { }
+		}
 		#endregion
 	}
 }
