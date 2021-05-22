@@ -12,13 +12,13 @@ namespace Ckode.Dapper.Repository.Sql
 
 		protected string FormattedViewName => $"[{Schema}].[{ViewName}]";
 
-		private readonly QueryGenerator _queryGenerator;
+		private readonly SqlQueryGenerator _queryGenerator;
 
 		private readonly QueryResultChecker<TEntity, TEntity> _resultChecker;
 
 		public ViewRepository()
 		{
-			_queryGenerator = new QueryGenerator(ViewName, Schema);
+			_queryGenerator = new SqlQueryGenerator(ViewName, Schema);
 			_resultChecker = new QueryResultChecker<TEntity, TEntity>();
 		}
 

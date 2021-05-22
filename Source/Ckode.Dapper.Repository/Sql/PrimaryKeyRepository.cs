@@ -22,7 +22,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 		protected string FormattedTableName => $"[{Schema}].[{TableName}]";
 
-		private readonly QueryGenerator _queryGenerator;
+		private readonly SqlQueryGenerator _queryGenerator;
 
 		private readonly QueryResultChecker<TPrimaryKeyEntity, TEntity> _resultChecker;
 
@@ -37,7 +37,7 @@ namespace Ckode.Dapper.Repository.Sql
 
 		public PrimaryKeyRepository()
 		{
-			_queryGenerator = new QueryGenerator(TableName, Schema);
+			_queryGenerator = new SqlQueryGenerator(TableName, Schema);
 			_resultChecker = new QueryResultChecker<TPrimaryKeyEntity, TEntity>();
 		}
 
