@@ -1,6 +1,6 @@
 ﻿using Ckode.Dapper.Repository.Attributes;
 
-namespace Ckode.Dapper.Repository.Tests.Entities
+namespace Ckode.Dapper.Repository.UnitTests.Entities
 {
 	public record HeapEntity : DbEntity
 	{

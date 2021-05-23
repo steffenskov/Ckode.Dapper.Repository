@@ -1,9 +1,9 @@
 using System;
 using Ckode.Dapper.Repository.Sql;
-using Ckode.Dapper.Repository.Tests.Entities;
+using Ckode.Dapper.Repository.UnitTests.Entities;
 using Xunit;
 
-namespace Ckode.Dapper.Repository.Tests.Sql
+namespace Ckode.Dapper.Repository.UnitTests.Sql
 {
 	public class QueryGeneratorTests
 	{
@@ -38,6 +38,21 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 		#endregion
 
 		#region Delete
+
+
+		[Fact]
+		public void GenerateDeleteQuery_CustomSchema_Valid()
+		{
+			// Arrange
+			var generator = new SqlQueryGenerator("Users", "account");
+
+			// Act
+			var query = generator.GenerateDeleteQuery<SinglePrimaryKeyEntity>();
+
+			// Assert
+			Assert.Equal("DELETE FROM [account].[Users] OUTPUT [deleted].[Id], [deleted].[Username], [deleted].[Password] WHERE [account].[Users].[Id] = @Id;", query);
+		}
+
 		[Fact]
 		public void GenerateDeleteQuery_OnePrimaryKey_Valid()
 		{
@@ -92,6 +107,50 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 		#endregion
 
 		#region Insert
+		[Fact]
+		public void GenerateInsertQuery_CustomSchema_Valid()
+		{
+			// Arrange
+			var generator = new SqlQueryGenerator("Users", "account");
+
+			// Act
+			var query = generator.GenerateInsertQuery(new SinglePrimaryKeyEntity());
+
+			// Assert
+			Assert.Equal("INSERT INTO [account].[Users] ([Username], [Password]) OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password);", query);
+		}
+
+		[Fact]
+		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndDefaultValue_Valid()
+		{
+			// Arrange
+			var generator = new SqlQueryGenerator("Users", "dbo");
+
+			// Actj
+			var query = generator.GenerateInsertQuery(new HasDefaultConstraintEntity());
+
+			// Assert
+			Assert.Equal("INSERT INTO [dbo].[Users] ([Id]) OUTPUT [inserted].[Id], [inserted].[DateCreated] VALUES (@Id);", query);
+		}
+
+		[Fact]
+		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndNonDefaultValue_Valid()
+		{
+			// Arrange
+			var generator = new SqlQueryGenerator("Users", "dbo");
+			var record = new HasDefaultConstraintEntity
+			{
+				Id = 42,
+				DateCreated = DateTime.Now
+			};
+
+			// Act
+			var query = generator.GenerateInsertQuery(record);
+
+			// Assert
+			Assert.Equal("INSERT INTO [dbo].[Users] ([Id], [DateCreated]) OUTPUT [inserted].[Id], [inserted].[DateCreated] VALUES (@Id, @DateCreated);", query);
+		}
+
 		[Fact]
 		public void GenerateInsertQuery_IdentityValuePrimaryKey_Valid()
 		{
@@ -312,63 +371,6 @@ namespace Ckode.Dapper.Repository.Tests.Sql
 
 			// Assert
 			Assert.Equal("UPDATE [dbo].[Users] SET [dbo].[Users].[Age] = @Age OUTPUT [inserted].[Id], [inserted].[Age], [inserted].[DateCreated] WHERE [dbo].[Users].[Id] = @Id;", query);
-		}
-
-		[Fact]
-		public void GenerateDeleteQuery_CustomSchema_Valid()
-		{
-			// Arrange
-			var generator = new SqlQueryGenerator("Users", "account");
-
-			// Act
-			var query = generator.GenerateDeleteQuery<SinglePrimaryKeyEntity>();
-
-			// Assert
-			Assert.Equal("DELETE FROM [account].[Users] OUTPUT [deleted].[Id], [deleted].[Username], [deleted].[Password] WHERE [account].[Users].[Id] = @Id;", query);
-		}
-
-		[Fact]
-		public void GenerateInsertQuery_CustomSchema_Valid()
-		{
-			// Arrange
-			var generator = new SqlQueryGenerator("Users", "account");
-
-			// Act
-			var query = generator.GenerateInsertQuery(new SinglePrimaryKeyEntity());
-
-			// Assert
-			Assert.Equal("INSERT INTO [account].[Users] ([Username], [Password]) OUTPUT [inserted].[Id], [inserted].[Username], [inserted].[Password] VALUES (@Username, @Password);", query);
-		}
-
-		[Fact]
-		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndDefaultValue_Valid()
-		{
-			// Arrange
-			var generator = new SqlQueryGenerator("Users", "dbo");
-
-			// Actj
-			var query = generator.GenerateInsertQuery(new HasDefaultConstraintEntity());
-
-			// Assert
-			Assert.Equal("INSERT INTO [dbo].[Users] ([Id]) OUTPUT [inserted].[Id], [inserted].[DateCreated] VALUES (@Id);", query);
-		}
-
-		[Fact]
-		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndNonDefaultValue_Valid()
-		{
-			// Arrange
-			var generator = new SqlQueryGenerator("Users", "dbo");
-			var record = new HasDefaultConstraintEntity
-			{
-				Id = 42,
-				DateCreated = DateTime.Now
-			};
-
-			// Act
-			var query = generator.GenerateInsertQuery(record);
-
-			// Assert
-			Assert.Equal("INSERT INTO [dbo].[Users] ([Id], [DateCreated]) OUTPUT [inserted].[Id], [inserted].[DateCreated] VALUES (@Id, @DateCreated);", query);
 		}
 		#endregion
 	}

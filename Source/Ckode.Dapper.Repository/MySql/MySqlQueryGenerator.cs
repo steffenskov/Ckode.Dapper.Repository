@@ -49,12 +49,44 @@ DELETE FROM {_table} WHERE {whereClause};";
 
 		public string GenerateGetQuery<TEntity>() where TEntity : DbEntity
 		{
-			throw new NotImplementedException();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
+			var whereClause = info.PrimaryKeys.Count == 0
+										? GenerateWhereClauseWithoutPrimaryKey(info)
+										: GenerateWhereClauseWithPrimaryKeys(info);
+
+			var columnsList = GenerateColumnsList(_table, info.Columns);
+
+			return $"SELECT {columnsList} FROM {_table} WHERE {whereClause};";
 		}
 
 		public string GenerateInsertQuery<TEntity>(TEntity entity) where TEntity : DbEntity
 		{
-			throw new NotImplementedException();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
+			var identityColumns = info.PrimaryKeys.Where(pk => pk.IsIdentity).ToList();
+			var identityProperties = identityColumns.Select(pk => pk.Property).ToList();
+
+			var columnsToInsert = info.Columns
+										.Where(column => !identityProperties.Contains(column.Property) && (!column.HasDefaultConstraint || !column.HasDefaultValue(entity)))
+										.ToList();
+
+			string selectStatement = "";
+			if (identityColumns.Any())
+			{
+				var column = identityColumns.SingleOrDefault();
+				if (column == null)
+				{
+					throw new InvalidOperationException("Cannot generate INSERT query for table with multiple identity columns");
+				}
+				var columnsList = GenerateColumnsList(_table, info.Columns);
+				selectStatement = $"SELECT {columnsList} FROM {_table} WHERE {_table}.{column.ColumnName} = LAST_INSERT_ID()";
+			}
+			else
+			{
+				selectStatement = GenerateGetQuery<TEntity>();
+			}
+			return $@"INSERT INTO {_table} ({string.Join(", ", columnsToInsert.Select(column => column.ColumnName))}) VALUES ({string.Join(", ", columnsToInsert.Select(column => $"@{column.Name}"))});
+{selectStatement}";
+
 		}
 
 		public string GenerateUpdateQuery<TEntity>() where TEntity : DbEntity
