@@ -2,26 +2,20 @@ using System;
 using System.Linq;
 using Ckode.Dapper.Repository.Exceptions;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
-using Ckode.Dapper.Repository.IntegrationTests.Repositories;
+using Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories;
 using Xunit;
 
-namespace Ckode.Dapper.Repository.IntegrationTests
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 {
 	public class PrimaryKeyEventTests
 	{
 
 		#region Delete
-		[Fact]
-		public void Delete_PreInsertHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Delete_PreInsertHasEvent_IsInvoked(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PreDelete += (inputEntity, cancelArgs) =>
@@ -34,17 +28,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Delete_PreInsertThrows_IsDeleted()
+		[Theory, AutoDomainData]
+		public void Delete_PreInsertThrows_IsDeleted(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PreDelete += (inputEntity, cancelArgs) =>
@@ -62,17 +50,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.NotSame(deletedEntity, insertedEntity); // Ensure we're not just handed the inputEntity back
 		}
 
-		[Fact]
-		public void Delete_PreInsertCancels_IsCanceled()
+		[Theory, AutoDomainData]
+		public void Delete_PreInsertCancels_IsCanceled(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			var shouldCancel = true;
@@ -93,17 +75,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Delete_PostDeleteHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Delete_PostDeleteHasEvent_IsInvoked(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			CategoryEntity deletedEntity = null!;
@@ -120,17 +96,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.Same(result, deletedEntity);
 		}
 
-		[Fact]
-		public void Delete_PostDeleteThrows_IsDeleted()
+		[Theory, AutoDomainData]
+		public void Delete_PostDeleteThrows_IsDeleted(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PostDelete += (tmpEntity) =>
@@ -148,17 +118,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		#endregion
 
 		#region Insert
-		[Fact]
-		public void Insert_PreInsertHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Insert_PreInsertHasEvent_IsInvoked(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			repository.PreInsert += (preInsertEntity, cancelArgs) =>
 			{
@@ -172,17 +136,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Insert_PreInsertThrows_IsInserted()
+		[Theory, AutoDomainData]
+		public void Insert_PreInsertThrows_IsInserted(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			repository.PreInsert += (preInsertEntity, cancelArgs) =>
 			{
@@ -203,17 +161,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 
-		[Fact]
-		public void Insert_PreInsertCancels_IsCancelled()
+		[Theory, AutoDomainData]
+		public void Insert_PreInsertCancels_IsCancelled(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			repository.PreInsert += (preInsertEntity, cancelArgs) =>
 			{
@@ -227,17 +179,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.DoesNotContain(entity.Name, allNames);
 		}
 
-		[Fact]
-		public void Insert_PostInsertHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Insert_PostInsertHasEvent_IsInvoked(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			CategoryEntity postInsertEntity = null!;
 			repository.PostInsert += (tmpEntity) =>
@@ -260,17 +206,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 
-		[Fact]
-		public void Insert_PostInsertThrows_IsInserted()
+		[Theory, AutoDomainData]
+		public void Insert_PostInsertThrows_IsInserted(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			repository.PostInsert += (tmpEntity) =>
 			{
@@ -293,17 +233,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		#endregion
 
 		#region Update
-		[Fact]
-		public void Update_PreUpdateHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Update_PreUpdateHasEvent_IsInvoked(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			var insertedEntity = repository.Insert(entity);
 
@@ -321,17 +255,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Update_PreUpdateThrows_IsUpdated()
+		[Theory, AutoDomainData]
+		public void Update_PreUpdateThrows_IsUpdated(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PreUpdate += (preUpdateEntity, cancelArgs) =>
@@ -353,17 +281,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 
-		[Fact]
-		public void Update_PreUpdateCancels_IsCancelled()
+		[Theory, AutoDomainData]
+		public void Update_PreUpdateCancels_IsCancelled(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			repository.PreUpdate += (preUpdateEntity, cancelArgs) =>
 			{
@@ -380,17 +302,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Update_PostUpdateHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Update_PostUpdateHasEvent_IsInvoked(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			CategoryEntity postUpdateEntity = null!;
 			repository.PostUpdate += (tmpEntity) =>
@@ -415,17 +331,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 
-		[Fact]
-		public void Update_PostUpdatedThrows_IsUpdated()
+		[Theory, AutoDomainData]
+		public void Update_PostUpdatedThrows_IsUpdated(CategoryEntity entity)
 		{
 			// Arrange
 			var repository = new CategoryRepository();
-			var entity = new CategoryEntity
-			{
-				Description = "Lorem ipsum, dolor sit amit",
-				Name = GenerateName(),
-				Picture = null
-			};
 
 			var insertedEntity = repository.Insert(entity);
 
@@ -448,11 +358,5 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 		#endregion
-
-
-		private string GenerateName()
-		{
-			return Guid.NewGuid().ToString().Remove(15);
-		}
 	}
 }

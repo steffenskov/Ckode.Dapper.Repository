@@ -1,6 +1,6 @@
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
 {
 	public class UserHeapRepository : MyHeapRepository<UserHeapEntity>
 	{

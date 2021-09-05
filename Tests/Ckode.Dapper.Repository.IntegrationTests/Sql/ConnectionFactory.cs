@@ -1,7 +1,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Ckode.Dapper.Repository.IntegrationTests
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 {
 	public static class ConnectionFactory
 	{

@@ -1,9 +1,10 @@
+using System;
 using System.Data;
 using Ckode.Dapper.Repository.Sql;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
 {
-	public abstract class MyHeapRepository<TEntity> : HeapRepository<TEntity>
+	public abstract class MyViewRepository<TEntity> : ViewRepository<TEntity>
 	where TEntity : DbEntity
 	{
 		protected override IDbConnection CreateConnection()

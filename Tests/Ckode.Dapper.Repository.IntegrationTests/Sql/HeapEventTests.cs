@@ -1,26 +1,20 @@
 using System;
-using System.Linq;
 using Ckode.Dapper.Repository.Exceptions;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
-using Ckode.Dapper.Repository.IntegrationTests.Repositories;
+using Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories;
 using Xunit;
 
-namespace Ckode.Dapper.Repository.IntegrationTests
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 {
 	public class HeapEventTests
 	{
 
 		#region Delete
-		[Fact]
-		public void Delete_PreInsertHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Delete_PreInsertHasEvent_IsInvoked(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PreDelete += (inputEntity, cancelArgs) =>
@@ -33,16 +27,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Delete_PreInsertThrows_IsDeleted()
+		[Theory, AutoDomainData]
+		public void Delete_PreInsertThrows_IsDeleted(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PreDelete += (inputEntity, cancelArgs) =>
@@ -59,16 +48,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.NotSame(insertedEntity, deletedEntity); // Ensure we're not just handed the inputEntity back
 		}
 
-		[Fact]
-		public void Delete_PreInsertCancels_IsCanceled()
+		[Theory, AutoDomainData]
+		public void Delete_PreInsertCancels_IsCanceled(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			var shouldCancel = true;
@@ -89,16 +73,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Delete_PostDeleteHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Delete_PostDeleteHasEvent_IsInvoked(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			UserHeapEntity deletedEntity = null!;
@@ -115,16 +94,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.Same(result, deletedEntity);
 		}
 
-		[Fact]
-		public void Delete_PostDeleteThrows_IsDeleted()
+		[Theory, AutoDomainData]
+		public void Delete_PostDeleteThrows_IsDeleted(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 			var insertedEntity = repository.Insert(entity);
 
 			repository.PostDelete += (tmpEntity) =>
@@ -142,16 +116,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 		#endregion
 
 		#region Insert
-		[Fact]
-		public void Insert_PreInsertHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Insert_PreInsertHasEvent_IsInvoked(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 
 			repository.PreInsert += (preInsertEntity, cancelArgs) =>
 			{
@@ -165,16 +134,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			repository.Delete(insertedEntity);
 		}
 
-		[Fact]
-		public void Insert_PreInsertThrows_IsInserted()
+		[Theory, AutoDomainData]
+		public void Insert_PreInsertThrows_IsInserted(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 
 			repository.PreInsert += (preInsertEntity, cancelArgs) =>
 			{
@@ -195,16 +159,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 
-		[Fact]
-		public void Insert_PreInsertCancels_IsCancelled()
+		[Theory, AutoDomainData]
+		public void Insert_PreInsertCancels_IsCancelled(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 
 			repository.PreInsert += (preInsertEntity, cancelArgs) =>
 			{
@@ -217,16 +176,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			Assert.Throws<NoEntityFoundException>(() => repository.Get(entity));
 		}
 
-		[Fact]
-		public void Insert_PostInsertHasEvent_IsInvoked()
+		[Theory, AutoDomainData]
+		public void Insert_PostInsertHasEvent_IsInvoked(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 
 			UserHeapEntity postInsertEntity = null!;
 			repository.PostInsert += (tmpEntity) =>
@@ -249,16 +203,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 
-		[Fact]
-		public void Insert_PostInsertThrows_IsInserted()
+		[Theory, AutoDomainData]
+		public void Insert_PostInsertThrows_IsInserted(UserHeapEntity entity)
 		{
 			// Arrange
 			var repository = new UserHeapRepository();
-			var entity = new UserHeapEntity
-			{
-				Password = GenerateName(),
-				Username = GenerateName(),
-			};
 
 			repository.PostInsert += (tmpEntity) =>
 			{
@@ -279,10 +228,5 @@ namespace Ckode.Dapper.Repository.IntegrationTests
 			}
 		}
 		#endregion
-
-		private string GenerateName()
-		{
-			return Guid.NewGuid().ToString();
-		}
 	}
 }

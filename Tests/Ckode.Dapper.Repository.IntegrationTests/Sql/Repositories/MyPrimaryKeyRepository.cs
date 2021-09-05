@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Ckode.Dapper.Repository.Sql;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Repositories
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
 {
 	public abstract class MyPrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : PrimaryKeyRepository<TPrimaryKeyEntity, TEntity>
 	where TPrimaryKeyEntity : DbEntity
