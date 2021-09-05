@@ -78,7 +78,7 @@ DELETE FROM {_table} WHERE {whereClause};";
 					throw new InvalidOperationException("Cannot generate INSERT query for table with multiple identity columns");
 				}
 				var columnsList = GenerateColumnsList(_table, info.Columns);
-				selectStatement = $"SELECT {columnsList} FROM {_table} WHERE {_table}.{column.ColumnName} = LAST_INSERT_ID()";
+				selectStatement = $"SELECT {columnsList} FROM {_table} WHERE {_table}.{column.ColumnName} = LAST_INSERT_ID();";
 			}
 			else
 			{
@@ -89,12 +89,36 @@ DELETE FROM {_table} WHERE {whereClause};";
 
 		}
 
-		public string GenerateUpdateQuery<TEntity>() where TEntity : DbEntity
+		public string GenerateUpdateQuery<TEntity>()
+		where TEntity : DbEntity
 		{
-			throw new NotImplementedException();
+			var info = EntityInformationCache.GetEntityInformation<TEntity>();
+			if (!info.PrimaryKeys.Any())
+			{
+				throw new InvalidOperationException($"GenerateGetQuery for entity of type {typeof(TEntity).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
+			}
+
+			var setClause = GenerateSetClause(info);
+
+			if (string.IsNullOrEmpty(setClause))
+			{
+				throw new InvalidOperationException($"GenerateGetQuery for entity of type {typeof(TEntity).FullName} failed as the type has no columns with a setter.");
+			}
+
+			var outputColumns = GenerateColumnsList("inserted", info.Columns);
+			var selectStatement = GenerateGetQuery<TEntity>();
+			return $@"UPDATE {_table} SET {setClause} WHERE {GenerateWhereClauseWithPrimaryKeys(info)};
+{selectStatement}";
 		}
 
 		#region Helpers
+
+		private string GenerateSetClause(EntityInformation info)
+		{
+			var primaryKeys = info.PrimaryKeys.Select(pk => pk.Property).ToList();
+			var columnsToSet = info.Columns.Where(column => !primaryKeys.Contains(column.Property) && column.HasSetter);
+			return string.Join(", ", columnsToSet.Select(column => $"{column.ColumnName} = @{column.Name}"));
+		}
 
 		private string GenerateWhereClauseWithoutPrimaryKey(EntityInformation info)
 		{

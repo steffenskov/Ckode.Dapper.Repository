@@ -225,7 +225,7 @@ SELECT Users.Id, Users.Username, Users.Password FROM Users WHERE Users.Id = LAST
 
 			// Assert
 			Assert.Equal(@"INSERT INTO Users (Username, Password, DateCreated) VALUES (@Username, @Password, @DateCreated);
-SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password =  @Password;", insertQuery);
+SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;", insertQuery);
 		}
 
 		[Fact]
@@ -239,7 +239,7 @@ SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.
 
 			// Assert
 			Assert.Equal(@"INSERT INTO Users (Username, Password, DateCreated) VALUES (@Username, @Password, @DateCreated);
-SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password =  @Password;", insertQuery);
+SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;", insertQuery);
 		}
 
 		[Fact]
@@ -266,7 +266,7 @@ SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders WHERE Orders
 			var insertQuery = generator.GenerateInsertQuery(new HeapEntity());
 
 			// Assert
-			Assert.Equal(@"INSERT INTO Users (Username, Password) OUTPUT inserted.Username, inserted.Password VALUES (@Username, @Password);
+			Assert.Equal(@"INSERT INTO Users (Username, Password) VALUES (@Username, @Password);
 SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;", insertQuery);
 		}
 		#endregion
@@ -283,7 +283,8 @@ SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Usernam
 			var updateQuery = generator.GenerateUpdateQuery<SinglePrimaryKeyEntity>();
 
 			// Assert
-			Assert.Equal($"UPDATE Users SET Users.Username = @Username, Users.Password = @Password OUTPUT inserted.Id, inserted.Username, inserted.Password WHERE Users.Id = @Id;", updateQuery);
+			Assert.Equal($@"UPDATE Users SET Username = @Username, Password = @Password WHERE Users.Id = @Id;
+SELECT Users.Id, Users.Username, Users.Password FROM Users WHERE Users.Id = @Id;", updateQuery);
 		}
 
 		[Fact]
@@ -296,7 +297,8 @@ SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Usernam
 			var updateQuery = generator.GenerateUpdateQuery<CompositePrimaryKeyEntity>();
 
 			// Assert
-			Assert.Equal($"UPDATE Users SET Users.DateCreated = @DateCreated OUTPUT inserted.Username, inserted.Password, inserted.DateCreated WHERE Users.Username = @Username AND Users.Password = @Password;", updateQuery);
+			Assert.Equal($@"UPDATE Users SET DateCreated = @DateCreated WHERE Users.Username = @Username AND Users.Password = @Password;
+SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;", updateQuery);
 		}
 
 		[Fact]
@@ -309,7 +311,8 @@ SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Usernam
 			var updateQuery = generator.GenerateUpdateQuery<CustomColumnNamesEntity>();
 
 			// Assert
-			Assert.Equal($"UPDATE Orders SET Orders.DateCreated = @Date OUTPUT inserted.OrderId AS Id, inserted.DateCreated AS Date WHERE Orders.OrderId = @Id;", updateQuery);
+			Assert.Equal($@"UPDATE Orders SET DateCreated = @Date WHERE Orders.OrderId = @Id;
+SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders WHERE Orders.OrderId = @Id;", updateQuery);
 		}
 
 		[Fact]
@@ -342,7 +345,8 @@ SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Usernam
 			var query = generator.GenerateUpdateQuery<ColumnHasMissingSetterEntity>();
 
 			// Assert
-			Assert.Equal("UPDATE Users SET Users.Age = @Age OUTPUT inserted.Id, inserted.Age, inserted.DateCreated WHERE Users.Id = @Id;", query);
+			Assert.Equal(@"UPDATE Users SET Age = @Age WHERE Users.Id = @Id;
+SELECT Users.Id, Users.Age, Users.DateCreated FROM Users WHERE Users.Id = @Id;", query);
 		}
 		#endregion
 	}
