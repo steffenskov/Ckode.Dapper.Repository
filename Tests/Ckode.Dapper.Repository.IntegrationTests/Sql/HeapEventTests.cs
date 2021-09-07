@@ -44,7 +44,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 
 			// Assert
 			Assert.Equal(insertedEntity, deletedEntity);
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(deletedEntity));
+			var gotten = repository.Get(deletedEntity!);
+			Assert.Null(gotten);
 			Assert.NotSame(insertedEntity, deletedEntity); // Ensure we're not just handed the inputEntity back
 		}
 
@@ -80,7 +81,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var repository = new UserHeapRepository();
 			var insertedEntity = repository.Insert(entity);
 
-			UserHeapEntity deletedEntity = null!;
+			UserHeapEntity? deletedEntity = null;
 			repository.PostDelete += (tmpEntity) =>
 			{
 				deletedEntity = tmpEntity;
@@ -111,7 +112,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 
 			// Assert
 			Assert.Equal(insertedEntity, result);
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(result));
+			var gotten = repository.Get(result!);
+			Assert.Null(gotten);
 		}
 		#endregion
 
@@ -173,7 +175,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Act && Assert
 			Assert.Throws<CanceledException>(() => repository.Insert(entity));
 
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(entity));
+			var gotten = repository.Get(entity);
+			Assert.Null(gotten);
 		}
 
 		[Theory, AutoDomainData]
@@ -182,7 +185,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Arrange
 			var repository = new UserHeapRepository();
 
-			UserHeapEntity postInsertEntity = null!;
+			UserHeapEntity? postInsertEntity = null;
 			repository.PostInsert += (tmpEntity) =>
 			{
 				postInsertEntity = tmpEntity;

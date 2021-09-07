@@ -1,22 +1,16 @@
-using System;
-
 namespace Ckode.Dapper.Repository.Interfaces
 {
-	public interface IQueryGenerator
+	public interface IQueryGenerator<TEntity>
+	where TEntity : DbEntity
 	{
-		string GenerateDeleteQuery<TEntity>()
-		where TEntity : DbEntity;
+		string GenerateDeleteQuery();
 
-		string GenerateInsertQuery<TEntity>(TEntity entity)
-	   	where TEntity : DbEntity;
+		string GenerateInsertQuery(TEntity entity);
 
-		string GenerateGetAllQuery<TEntity>()
-		where TEntity : DbEntity;
+		string GenerateGetAllQuery();
 
-		string GenerateGetQuery<TEntity>()
-		where TEntity : DbEntity;
+		string GenerateGetQuery();
 
-		string GenerateUpdateQuery<TEntity>()
-		where TEntity : DbEntity;
+		string GenerateUpdateQuery();
 	}
 }

@@ -1,28 +1,28 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using Ckode.Dapper.Repository.Interfaces;
 
-namespace Ckode.Dapper.Repository.Sql
+namespace Ckode.Dapper.Repository.BaseRepositories
 {
-	/// <summary>
-	/// Base repository, don't inherit this class, but rather use PrimaryKeyRepository or HeapRepository.
-	/// </summary>
-	public abstract class DbRepository<TEntity>
+	public abstract class BaseDbRepository<TEntity>
 	where TEntity : DbEntity
 	{
-		protected string Schema => "dbo";
-
 		protected abstract IDbConnection CreateConnection();
 
 		protected abstract IDapperInjection<T> CreateDapperInjection<T>();
 
+		protected abstract IQueryGenerator<TEntity> CreateQueryGenerator();
+
 		private readonly IDapperInjection<TEntity> _dapperInjection;
 
+		protected readonly IQueryGenerator<TEntity> _queryGenerator;
 
-		protected DbRepository()
+
+		protected BaseDbRepository()
 		{
 			_dapperInjection = CreateDapperInjection<TEntity>();
+			_queryGenerator = CreateQueryGenerator();
 		}
 
 		#region Query

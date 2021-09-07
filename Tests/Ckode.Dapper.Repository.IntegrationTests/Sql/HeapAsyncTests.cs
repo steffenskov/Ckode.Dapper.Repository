@@ -17,13 +17,16 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public async Task Delete_MissingColumns_Throws()
+		public async Task Delete_MissingColumns_ReturnsNull()
 		{
 			// Arrange
 			var entity = new UserHeapEntity { Username = "My name" };
 
-			// Act && Assert
-			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await _repository.DeleteAsync(entity));
+			// Act 
+			var deleted = await _repository.DeleteAsync(entity);
+
+			// Assert
+			Assert.Null(deleted);
 		}
 
 		[Theory, AutoDomainData]
@@ -36,8 +39,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deletedEntity = await _repository.DeleteAsync(entity);
 
 			// Assert
-			Assert.Equal(entity.Username, deletedEntity.Username);
-			Assert.Equal(entity.Password, deletedEntity.Password);
+			Assert.Equal(entity.Username, deletedEntity?.Username);
+			Assert.Equal(entity.Password, deletedEntity?.Password);
 		}
 
 		[Theory, AutoDomainData]
@@ -51,14 +54,18 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deletedEntity = await _repository.DeleteAsync(entity);
 
 			// Assert
-			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await _repository.GetAsync(entity));
+			var gotten = await _repository.GetAsync(entity);
+			Assert.Null(gotten);
 		}
 
 		[Theory, AutoDomainData]
-		public async Task Get_ValuesNotInDatabase_Throws(UserHeapEntity entity)
+		public async Task Get_ValuesNotInDatabase_ReturnsNull(UserHeapEntity entity)
 		{
-			// Act && Assert
-			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await _repository.GetAsync(entity));
+			// Act
+			var gotten = await _repository.GetAsync(entity);
+
+			// Assert
+			Assert.Null(gotten);
 		}
 
 		[Theory, AutoDomainData]
@@ -74,8 +81,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			try
 			{
 				// Assert
-				Assert.Equal(entity.Username, gotten.Username);
-				Assert.Equal(entity.Password, gotten.Password);
+				Assert.Equal(entity.Username, gotten?.Username);
+				Assert.Equal(entity.Password, gotten?.Password);
 			}
 			finally
 			{
@@ -93,8 +100,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deletedEntity = await _repository.DeleteAsync(entity);
 
 			// Assert
-			Assert.Equal(entity.Username, deletedEntity.Username);
-			Assert.Equal(entity.Password, deletedEntity.Password);
+			Assert.Equal(entity.Username, deletedEntity?.Username);
+			Assert.Equal(entity.Password, deletedEntity?.Password);
 		}
 
 		[Fact]

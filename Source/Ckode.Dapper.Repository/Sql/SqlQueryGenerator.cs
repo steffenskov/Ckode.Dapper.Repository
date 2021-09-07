@@ -9,11 +9,12 @@ using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 [assembly: InternalsVisibleTo("Ckode.Dapper.Repository.UnitTests")]
 namespace Ckode.Dapper.Repository.Sql
 {
-	internal class SqlQueryGenerator : IQueryGenerator
+	internal class SqlQueryGenerator<TEntity> : IQueryGenerator<TEntity>
+	where TEntity : DbEntity
 	{
 		private readonly string _schemaAndTable;
 
-		public SqlQueryGenerator(string tableName, string schema)
+		public SqlQueryGenerator(string schema, string tableName)
 		{
 			if (tableName == null)
 			{
@@ -37,8 +38,7 @@ namespace Ckode.Dapper.Repository.Sql
 			_schemaAndTable = $"{EnsureSquareBrackets(schema)}.{EnsureSquareBrackets(tableName)}";
 		}
 
-		public string GenerateDeleteQuery<TEntity>()
-		where TEntity : DbEntity
+		public string GenerateDeleteQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
@@ -50,8 +50,7 @@ namespace Ckode.Dapper.Repository.Sql
 			return $"DELETE FROM {_schemaAndTable} OUTPUT {outputColumns} WHERE {whereClause};";
 		}
 
-		public string GenerateInsertQuery<TEntity>(TEntity entity)
-		where TEntity : DbEntity
+		public string GenerateInsertQuery(TEntity entity)
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var identityColumns = info.PrimaryKeys.Where(pk => pk.IsIdentity).Select(pk => pk.Property).ToList();
@@ -64,16 +63,14 @@ namespace Ckode.Dapper.Repository.Sql
 			return $"INSERT INTO {_schemaAndTable} ({string.Join(", ", columnsToInsert.Select(column => AddSquareBrackets(column.ColumnName)))}) OUTPUT {outputColumns} VALUES ({string.Join(", ", columnsToInsert.Select(column => $"@{column.Name}"))});";
 		}
 
-		public string GenerateGetAllQuery<TEntity>()
-		where TEntity : DbEntity
+		public string GenerateGetAllQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var columnsList = GenerateColumnsList(_schemaAndTable, info.Columns);
 			return $"SELECT {columnsList} FROM {_schemaAndTable};";
 		}
 
-		public string GenerateGetQuery<TEntity>()
-		where TEntity : DbEntity
+		public string GenerateGetQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var whereClause = info.PrimaryKeys.Count == 0
@@ -85,20 +82,19 @@ namespace Ckode.Dapper.Repository.Sql
 			return $"SELECT {columnsList} FROM {_schemaAndTable} WHERE {whereClause};";
 		}
 
-		public string GenerateUpdateQuery<TEntity>()
-		where TEntity : DbEntity
+		public string GenerateUpdateQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			if (!info.PrimaryKeys.Any())
 			{
-				throw new InvalidOperationException($"GenerateGetQuery for entity of type {typeof(TEntity).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
+				throw new InvalidOperationException($"GenerateUpdateQuery for entity of type {typeof(TEntity).FullName} failed as the type has no properties marked with [PrimaryKeyColumn].");
 			}
 
 			var setClause = GenerateSetClause(info);
 
 			if (string.IsNullOrEmpty(setClause))
 			{
-				throw new InvalidOperationException($"GenerateGetQuery for entity of type {typeof(TEntity).FullName} failed as the type has no columns with a setter.");
+				throw new InvalidOperationException($"GenerateUpdateQuery for entity of type {typeof(TEntity).FullName} failed as the type has no columns with a setter.");
 			}
 
 			var outputColumns = GenerateColumnsList("inserted", info.Columns);

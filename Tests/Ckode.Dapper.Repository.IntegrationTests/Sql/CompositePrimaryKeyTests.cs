@@ -22,10 +22,13 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Delete_UseMissingPrimaryKeyValue_Throws()
+		public void Delete_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Delete(new CompositeUserPrimaryKeyEntity { Username = "My name", Password = "Secret" }));
+			// Act
+			var deleted = _repository.Delete(new CompositeUserPrimaryKeyEntity { Username = "My name", Password = "Secret" });
+
+			// Assert
+			Assert.Null(deleted);
 		}
 
 		[Theory, AutoDomainData]
@@ -38,9 +41,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deleted = _repository.Delete(new CompositeUserPrimaryKeyEntity { Username = entity.Username, Password = entity.Password });
 
 			// Assert
-			Assert.Equal(entity.Username, deleted.Username);
-			Assert.Equal(entity.Password, deleted.Password);
-			Assert.Equal(insertedEntity.DateCreated, deleted.DateCreated);
+			Assert.Equal(entity.Username, deleted?.Username);
+			Assert.Equal(entity.Password, deleted?.Password);
+			Assert.Equal(insertedEntity.DateCreated, deleted?.DateCreated);
 		}
 
 		[Fact]
@@ -51,10 +54,13 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Get_UseMissingPrimaryKeyValue_Throws()
+		public void Get_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Get(new CompositeUserPrimaryKeyEntity { Username = "My name", Password = "Secret" }));
+			// Act
+			var gotten = _repository.Get(new CompositeUserPrimaryKeyEntity { Username = "My name", Password = "Secret" });
+
+			// Assert
+			Assert.Null(gotten);
 		}
 
 		[Theory, AutoDomainData]
@@ -67,9 +73,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var gotten = _repository.Get(new CompositeUserPrimaryKeyEntity { Username = entity.Username, Password = entity.Password });
 
 			// Assert
-			Assert.Equal(entity.Username, gotten.Username);
-			Assert.Equal(entity.Password, gotten.Password);
-			Assert.Equal(insertedEntity.DateCreated, gotten.DateCreated);
+			Assert.Equal(entity.Username, gotten?.Username);
+			Assert.Equal(entity.Password, gotten?.Password);
+			Assert.Equal(insertedEntity.DateCreated, gotten?.DateCreated);
 
 			_repository.Delete(insertedEntity);
 		}
@@ -82,10 +88,13 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Update_UseMissingPrimaryKeyValue_Throws()
+		public void Update_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
 			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Update(new CompositeUserEntity { Username = "Doesnt exist", Password = "Secret" }));
+			var updated = _repository.Update(new CompositeUserEntity { Username = "Doesnt exist", Password = "Secret" });
+
+			// Assert
+			Assert.Null(updated);
 		}
 
 		[Theory, AutoDomainData]
@@ -98,11 +107,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var updated = _repository.Update(insertedEntity with { Age = 42 });
 
 			// Assert
-			Assert.Equal(entity.Username, updated.Username);
-			Assert.Equal(entity.Password, updated.Password);
+			Assert.Equal(entity.Username, updated?.Username);
+			Assert.Equal(entity.Password, updated?.Password);
 			Assert.NotEqual(42, insertedEntity.Age);
-			Assert.Equal(42, updated.Age);
-			Assert.Equal(insertedEntity.DateCreated, updated.DateCreated);
+			Assert.Equal(42, updated?.Age);
+			Assert.Equal(insertedEntity.DateCreated, updated?.DateCreated);
 
 			_repository.Delete(insertedEntity);
 		}

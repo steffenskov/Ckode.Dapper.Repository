@@ -13,7 +13,7 @@ namespace Ckode.Dapper.Repository.UnitTests.MySql
 		public void Constructor_TableNameIsNull_Throws()
 		{
 			// Arrange, Act && Assert
-			Assert.Throws<ArgumentNullException>(() => new MySqlQueryGenerator(null!));
+			Assert.Throws<ArgumentNullException>(() => new MySqlQueryGenerator<HeapEntity>(null!));
 		}
 
 
@@ -21,7 +21,7 @@ namespace Ckode.Dapper.Repository.UnitTests.MySql
 		public void Constructor_TableNameIsWhiteSpace_Throws()
 		{
 			// Arrange, Act && Assert
-			Assert.Throws<ArgumentException>(() => new MySqlQueryGenerator(" "));
+			Assert.Throws<ArgumentException>(() => new MySqlQueryGenerator<HeapEntity>(" "));
 		}
 		#endregion
 
@@ -31,10 +31,10 @@ namespace Ckode.Dapper.Repository.UnitTests.MySql
 		public void GenerateDeleteQuery_OnePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<SinglePrimaryKeyEntity>("Users");
 
 			// Act
-			var deleteQuery = generator.GenerateDeleteQuery<SinglePrimaryKeyEntity>();
+			var deleteQuery = generator.GenerateDeleteQuery();
 
 			// Assert
 			Assert.Equal($@"SELECT Users.Id, Users.Username, Users.Password FROM Users WHERE Users.Id = @Id;
@@ -45,10 +45,10 @@ DELETE FROM Users WHERE Users.Id = @Id;", deleteQuery);
 		public void GenerateDeleteQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<CompositePrimaryKeyEntity>("Users");
 
 			// Act
-			var deleteQuery = generator.GenerateDeleteQuery<CompositePrimaryKeyEntity>();
+			var deleteQuery = generator.GenerateDeleteQuery();
 
 			// Assert
 			Assert.Equal($@"SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;
@@ -59,10 +59,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateDeleteQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Orders");
+			var generator = new MySqlQueryGenerator<CustomColumnNamesEntity>("Orders");
 
 			// Act
-			var deleteQuery = generator.GenerateDeleteQuery<CustomColumnNamesEntity>();
+			var deleteQuery = generator.GenerateDeleteQuery();
 
 			// Assert
 			Assert.Equal($@"SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders WHERE Orders.OrderId = @Id;
@@ -73,10 +73,10 @@ DELETE FROM Orders WHERE Orders.OrderId = @Id;", deleteQuery);
 		public void GenerateDeleteQuery_NoPrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HeapEntity>("Users");
 
 			// Act
-			var deleteQuery = generator.GenerateDeleteQuery<HeapEntity>();
+			var deleteQuery = generator.GenerateDeleteQuery();
 
 			// Assert
 			Assert.Equal($@"SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;
@@ -89,10 +89,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateGetAllQuery_ProperTableName_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HeapEntity>("Users");
 
 			// Act
-			var selectQuery = generator.GenerateGetAllQuery<HeapEntity>();
+			var selectQuery = generator.GenerateGetAllQuery();
 
 			// Assert
 			Assert.Equal($"SELECT Users.Username, Users.Password FROM Users;", selectQuery);
@@ -102,10 +102,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateGetAllQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Orders");
+			var generator = new MySqlQueryGenerator<CustomColumnNamesEntity>("Orders");
 
 			// Act
-			var selectQuery = generator.GenerateGetAllQuery<CustomColumnNamesEntity>();
+			var selectQuery = generator.GenerateGetAllQuery();
 
 			// Assert
 			Assert.Equal($"SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders;", selectQuery);
@@ -117,10 +117,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateGetQuery_SinglePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<SinglePrimaryKeyEntity>("Users");
 
 			// Act
-			var selectQuery = generator.GenerateGetQuery<SinglePrimaryKeyEntity>();
+			var selectQuery = generator.GenerateGetQuery();
 
 			// Assert
 			Assert.Equal($"SELECT Users.Id, Users.Username, Users.Password FROM Users WHERE Users.Id = @Id;", selectQuery);
@@ -130,10 +130,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateGetQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<CompositePrimaryKeyEntity>("Users");
 
 			// Act
-			var selectQuery = generator.GenerateGetQuery<CompositePrimaryKeyEntity>();
+			var selectQuery = generator.GenerateGetQuery();
 
 			// Assert
 			Assert.Equal($"SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;", selectQuery);
@@ -143,10 +143,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateGetQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Orders");
+			var generator = new MySqlQueryGenerator<CustomColumnNamesEntity>("Orders");
 
 			// Act
-			var selectQuery = generator.GenerateGetQuery<CustomColumnNamesEntity>();
+			var selectQuery = generator.GenerateGetQuery();
 
 			// Assert
 			Assert.Equal($"SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders WHERE Orders.OrderId = @Id;", selectQuery);
@@ -156,10 +156,10 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateGetQuery_NoPrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HeapEntity>("Users");
 
 			// Act
-			var query = generator.GenerateGetQuery<HeapEntity>();
+			var query = generator.GenerateGetQuery();
 
 			// Assert
 			Assert.Equal("SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Username AND Users.Password = @Password;", query);
@@ -171,7 +171,7 @@ DELETE FROM Users WHERE Users.Username = @Username AND Users.Password = @Passwor
 		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndDefaultValue_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HasDefaultConstraintEntity>("Users");
 
 			// Actj
 			var query = generator.GenerateInsertQuery(new HasDefaultConstraintEntity());
@@ -185,7 +185,7 @@ SELECT Users.Id, Users.DateCreated FROM Users WHERE Users.Id = @Id;", query);
 		public void GenerateInsertQuery_ColumnHasDefaultConstraintAndNonDefaultValue_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HasDefaultConstraintEntity>("Users");
 			var record = new HasDefaultConstraintEntity
 			{
 				Id = 42,
@@ -204,7 +204,7 @@ SELECT Users.Id, Users.DateCreated FROM Users WHERE Users.Id = @Id;", query);
 		public void GenerateInsertQuery_IdentityValuePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<SinglePrimaryKeyEntity>("Users");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new SinglePrimaryKeyEntity());
@@ -218,7 +218,7 @@ SELECT Users.Id, Users.Username, Users.Password FROM Users WHERE Users.Id = LAST
 		public void GenerateInsertQuery_MissingColumnValue_ContainsColumn()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<CompositePrimaryKeyEntity>("Users");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new CompositePrimaryKeyEntity());
@@ -232,7 +232,7 @@ SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.
 		public void GenerateInsertQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<CompositePrimaryKeyEntity>("Users");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new CompositePrimaryKeyEntity());
@@ -246,7 +246,7 @@ SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.
 		public void GenerateInsertQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Orders");
+			var generator = new MySqlQueryGenerator<CustomColumnNamesEntity>("Orders");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new CustomColumnNamesEntity());
@@ -260,7 +260,7 @@ SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders WHERE Orders
 		public void GenerateInsertQuery_NoPrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HeapEntity>("Users");
 
 			// Act
 			var insertQuery = generator.GenerateInsertQuery(new HeapEntity());
@@ -277,10 +277,10 @@ SELECT Users.Username, Users.Password FROM Users WHERE Users.Username = @Usernam
 		public void GenerateUpdateQuery_SinglePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<SinglePrimaryKeyEntity>("Users");
 
 			// Act 
-			var updateQuery = generator.GenerateUpdateQuery<SinglePrimaryKeyEntity>();
+			var updateQuery = generator.GenerateUpdateQuery();
 
 			// Assert
 			Assert.Equal($@"UPDATE Users SET Username = @Username, Password = @Password WHERE Users.Id = @Id;
@@ -291,10 +291,10 @@ SELECT Users.Id, Users.Username, Users.Password FROM Users WHERE Users.Id = @Id;
 		public void GenerateUpdateQuery_CompositePrimaryKey_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<CompositePrimaryKeyEntity>("Users");
 
 			// Act 
-			var updateQuery = generator.GenerateUpdateQuery<CompositePrimaryKeyEntity>();
+			var updateQuery = generator.GenerateUpdateQuery();
 
 			// Assert
 			Assert.Equal($@"UPDATE Users SET DateCreated = @DateCreated WHERE Users.Username = @Username AND Users.Password = @Password;
@@ -305,10 +305,10 @@ SELECT Users.Username, Users.Password, Users.DateCreated FROM Users WHERE Users.
 		public void GenerateUpdateQuery_CustomColumnNames_Valid()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Orders");
+			var generator = new MySqlQueryGenerator<CustomColumnNamesEntity>("Orders");
 
 			// Act 
-			var updateQuery = generator.GenerateUpdateQuery<CustomColumnNamesEntity>();
+			var updateQuery = generator.GenerateUpdateQuery();
 
 			// Assert
 			Assert.Equal($@"UPDATE Orders SET DateCreated = @Date WHERE Orders.OrderId = @Id;
@@ -319,30 +319,30 @@ SELECT Orders.OrderId AS Id, Orders.DateCreated AS Date FROM Orders WHERE Orders
 		public void GenerateUpdateQuery_NoPrimaryKey_Throws()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<HeapEntity>("Users");
 
 			// Act && Assert
-			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<HeapEntity>());
+			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery());
 		}
 
 		[Fact]
 		public void GenerateUpdateQuery_AllColumnsHasNoSetter_Throws()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<AllColumnsHasMissingSetterEntity>("Users");
 
 			// Act && Assert
-			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery<AllColumnsHasMissingSetterEntity>());
+			Assert.Throws<InvalidOperationException>(() => generator.GenerateUpdateQuery());
 		}
 
 		[Fact]
 		public void GenerateUpdateQuery_ColumnHasNoSetter_ColumnIsExcluded()
 		{
 			// Arrange
-			var generator = new MySqlQueryGenerator("Users");
+			var generator = new MySqlQueryGenerator<ColumnHasMissingSetterEntity>("Users");
 
 			// Act
-			var query = generator.GenerateUpdateQuery<ColumnHasMissingSetterEntity>();
+			var query = generator.GenerateUpdateQuery();
 
 			// Assert
 			Assert.Equal(@"UPDATE Users SET Age = @Age WHERE Users.Id = @Id;

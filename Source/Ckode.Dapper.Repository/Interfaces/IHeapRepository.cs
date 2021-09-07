@@ -6,11 +6,11 @@ namespace Ckode.Dapper.Repository.Interfaces
 	public interface IHeapRepository<TEntity>
 	where TEntity : DbEntity
 	{
-		TEntity Delete(TEntity entity);
-		Task<TEntity> DeleteAsync(TEntity entity);
+		TEntity? Delete(TEntity entity);
+		Task<TEntity?> DeleteAsync(TEntity entity);
 
-		TEntity Get(TEntity entity);
-		Task<TEntity> GetAsync(TEntity entity);
+		TEntity? Get(TEntity entity);
+		Task<TEntity?> GetAsync(TEntity entity);
 
 		IEnumerable<TEntity> GetAll();
 		Task<IEnumerable<TEntity>> GetAllAsync();

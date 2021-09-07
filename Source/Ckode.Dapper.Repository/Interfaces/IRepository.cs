@@ -7,11 +7,11 @@ namespace Ckode.Dapper.Repository.Interfaces
 	where TPrimaryKeyEntity : DbEntity
 	where TEntity : TPrimaryKeyEntity
 	{
-		TEntity Delete(TPrimaryKeyEntity entity);
-		Task<TEntity> DeleteAsync(TPrimaryKeyEntity entity);
+		TEntity? Delete(TPrimaryKeyEntity entity);
+		Task<TEntity?> DeleteAsync(TPrimaryKeyEntity entity);
 
-		TEntity Get(TPrimaryKeyEntity entity);
-		Task<TEntity> GetAsync(TPrimaryKeyEntity entity);
+		TEntity? Get(TPrimaryKeyEntity entity);
+		Task<TEntity?> GetAsync(TPrimaryKeyEntity entity);
 
 		IEnumerable<TEntity> GetAll();
 		Task<IEnumerable<TEntity>> GetAllAsync();
@@ -19,7 +19,7 @@ namespace Ckode.Dapper.Repository.Interfaces
 		TEntity Insert(TEntity entity);
 		Task<TEntity> InsertAsync(TEntity entity);
 
-		TEntity Update(TEntity entity);
-		Task<TEntity> UpdateAsync(TEntity entity);
+		TEntity? Update(TEntity entity);
+		Task<TEntity?> UpdateAsync(TEntity entity);
 	}
 }

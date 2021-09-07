@@ -16,13 +16,16 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Delete_MissingColumns_Throws()
+		public void Delete_MissingColumns_ReturnsNull()
 		{
 			// Arrange
 			var entity = new UserHeapEntity { Username = "async My name" };
 
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Delete(entity));
+			// Act
+			var deleted = _repository.Delete(entity);
+
+			// Assert
+			Assert.Null(deleted);
 		}
 
 		[Theory, AutoDomainData]
@@ -35,8 +38,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deletedEntity = _repository.Delete(entity);
 
 			// Assert
-			Assert.Equal(entity.Username, deletedEntity.Username);
-			Assert.Equal(entity.Password, deletedEntity.Password);
+			Assert.Equal(entity.Username, deletedEntity?.Username);
+			Assert.Equal(entity.Password, deletedEntity?.Password);
 		}
 
 		[Theory, AutoDomainData]
@@ -50,14 +53,18 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deletedEntity = _repository.Delete(entity);
 
 			// Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Get(entity));
+			var gotten = _repository.Get(entity);
+			Assert.Null(gotten);
 		}
 
 		[Theory, AutoDomainData]
-		public void Get_ValuesNotInDatabase_Throws(UserHeapEntity entity)
+		public void Get_ValuesNotInDatabase_ReturnsNull(UserHeapEntity entity)
 		{
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Get(entity));
+			// Act
+			var gotten = _repository.Get(entity);
+
+			// Assert
+			Assert.Null(gotten);
 		}
 
 		[Theory, AutoDomainData]
@@ -73,8 +80,8 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			try
 			{
 				// Assert
-				Assert.Equal(entity.Username, gotten.Username);
-				Assert.Equal(entity.Password, gotten.Password);
+				Assert.Equal(entity.Username, gotten?.Username);
+				Assert.Equal(entity.Password, gotten?.Password);
 			}
 			finally
 			{

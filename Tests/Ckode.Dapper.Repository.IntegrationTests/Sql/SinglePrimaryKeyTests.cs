@@ -1,12 +1,11 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using Ckode.Dapper.Repository.IntegrationTests;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories;
 using Xunit;
 
-namespace Ckode.Dapper._repository.IntegrationTests.Sql
+namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 {
 	public class SinglePrimaryKeyTests
 	{
@@ -33,10 +32,13 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Delete_UseMissingPrimaryKeyValue_Throws()
+		public void Delete_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
+			// Act 
+			var deleted = _repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue });
+
+			// Assert
+			Assert.Null(deleted);
 		}
 
 		[Theory, AutoDomainData]
@@ -49,10 +51,10 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 			var deleted = _repository.Delete(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
-			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
-			Assert.Equal(entity.Description, deleted.Description);
-			Assert.Equal(entity.Name, deleted.Name);
-			Assert.Equal(entity.Picture, deleted.Picture);
+			Assert.Equal(insertedEntity.CategoryId, deleted?.CategoryId);
+			Assert.Equal(entity.Description, deleted?.Description);
+			Assert.Equal(entity.Name, deleted?.Name);
+			Assert.Equal(entity.Picture, deleted?.Picture);
 		}
 
 		[Theory, AutoDomainData]
@@ -65,10 +67,10 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 			var deleted = _repository.Delete(insertedEntity);
 
 			// Assert
-			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
-			Assert.Equal(entity.Description, deleted.Description);
-			Assert.Equal(entity.Name, deleted.Name);
-			Assert.Equal(entity.Picture, deleted.Picture);
+			Assert.Equal(insertedEntity.CategoryId, deleted?.CategoryId);
+			Assert.Equal(entity.Description, deleted?.Description);
+			Assert.Equal(entity.Name, deleted?.Name);
+			Assert.Equal(entity.Picture, deleted?.Picture);
 		}
 		#endregion
 
@@ -90,9 +92,9 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 			var fetchedEntity = _repository.Get(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
-			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
-			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
-			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
+			Assert.Equal(insertedEntity.Name, fetchedEntity?.Name);
+			Assert.Equal(insertedEntity.Description, fetchedEntity?.Description);
+			Assert.Equal(insertedEntity.Picture, fetchedEntity?.Picture);
 
 			_repository.Delete(insertedEntity);
 		}
@@ -107,9 +109,9 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 			var fetchedEntity = _repository.Get(insertedEntity);
 
 			// Assert
-			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
-			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
-			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
+			Assert.Equal(insertedEntity.Description, fetchedEntity?.Description);
+			Assert.Equal(insertedEntity.Name, fetchedEntity?.Name);
+			Assert.Equal(insertedEntity.Picture, fetchedEntity?.Picture);
 
 			_repository.Delete(insertedEntity);
 		}
@@ -122,10 +124,13 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Get_UseMissingPrimaryKey_Throws()
+		public void Get_UseMissingPrimaryKey_ReturnsNull()
 		{
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Get(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
+			// Act
+			var gotten = _repository.Get(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue });
+
+			// Assert
+			Assert.Null(gotten);
 		}
 		#endregion
 
@@ -220,7 +225,7 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 			var updatedEntity = _repository.Update(update);
 
 			// Assert
-			Assert.Equal("Something else", updatedEntity.Description);
+			Assert.Equal("Something else", updatedEntity?.Description);
 
 			_repository.Delete(insertedEntity);
 		}
@@ -233,7 +238,7 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public void Update_UseMissingPrimaryKeyValue_Throws()
+		public void Update_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
 			// Arrange
 			var entity = new CategoryEntity
@@ -243,8 +248,11 @@ namespace Ckode.Dapper._repository.IntegrationTests.Sql
 				Name = "Hello world"
 			};
 
-			// Act && Assert
-			Assert.Throws<NoEntityFoundException>(() => _repository.Update(entity));
+			// Act
+			var updated = _repository.Update(entity);
+
+			// Assert
+			Assert.Null(updated);
 		}
 		#endregion
 	}

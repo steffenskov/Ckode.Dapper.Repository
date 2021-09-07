@@ -44,8 +44,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deletedEntity = repository.Delete(insertedEntity);
 
 			// Assert
-			Assert.True(deletedEntity.CategoryId > 0);
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(deletedEntity));
+			Assert.True(deletedEntity?.CategoryId > 0);
+			var gotten = repository.Get(deletedEntity!);
+			Assert.Null(gotten);
 			Assert.Equal(deletedEntity, insertedEntity);
 			Assert.NotSame(deletedEntity, insertedEntity); // Ensure we're not just handed the inputEntity back
 		}
@@ -82,7 +83,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var repository = new CategoryRepository();
 			var insertedEntity = repository.Insert(entity);
 
-			CategoryEntity deletedEntity = null!;
+			CategoryEntity? deletedEntity = null;
 			repository.PostDelete += (tmpEntity) =>
 			{
 				deletedEntity = tmpEntity;
@@ -112,8 +113,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var result = repository.Delete(insertedEntity);
 
 			// Assert
-			Assert.True(result.CategoryId > 0);
-			Assert.Throws<NoEntityFoundException>(() => repository.Get(result));
+			Assert.True(result?.CategoryId > 0);
+			var gotten = repository.Get(result!);
+			Assert.Null(gotten);
 		}
 		#endregion
 
@@ -185,7 +187,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Arrange
 			var repository = new CategoryRepository();
 
-			CategoryEntity postInsertEntity = null!;
+			CategoryEntity? postInsertEntity = null;
 			repository.PostInsert += (tmpEntity) =>
 			{
 				postInsertEntity = tmpEntity;
@@ -273,7 +275,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Assert
 			try
 			{
-				Assert.Equal("Hello world", updatedEntity.Description);
+				Assert.Equal("Hello world", updatedEntity?.Description);
 			}
 			finally
 			{
@@ -297,7 +299,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Act && Assert
 			Assert.Throws<CanceledException>(() => repository.Update(insertedEntity with { Description = "Hello world" }));
 			var gottenEntity = repository.Get(insertedEntity);
-			Assert.Equal(entity.Description, gottenEntity.Description);
+			Assert.Equal(entity.Description, gottenEntity?.Description);
 
 			repository.Delete(insertedEntity);
 		}
@@ -308,7 +310,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Arrange
 			var repository = new CategoryRepository();
 
-			CategoryEntity postUpdateEntity = null!;
+			CategoryEntity? postUpdateEntity = null;
 			repository.PostUpdate += (tmpEntity) =>
 			{
 				postUpdateEntity = tmpEntity;
@@ -350,7 +352,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			// Assert
 			try
 			{
-				Assert.Equal("Hello world", updatedEntity.Description);
+				Assert.Equal("Hello world", updatedEntity?.Description);
 			}
 			finally
 			{

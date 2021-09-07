@@ -7,7 +7,8 @@ using Ckode.Dapper.Repository.MetaInformation.PropertyInfos;
 
 namespace Ckode.Dapper.Repository.MySql
 {
-	public class MySqlQueryGenerator : IQueryGenerator
+	public class MySqlQueryGenerator<TEntity> : IQueryGenerator<TEntity>
+	where TEntity : DbEntity
 	{
 		private readonly string _table;
 
@@ -27,7 +28,7 @@ namespace Ckode.Dapper.Repository.MySql
 			_table = tableName;
 		}
 
-		public string GenerateDeleteQuery<TEntity>() where TEntity : DbEntity
+		public string GenerateDeleteQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 
@@ -40,14 +41,14 @@ namespace Ckode.Dapper.Repository.MySql
 DELETE FROM {_table} WHERE {whereClause};";
 		}
 
-		public string GenerateGetAllQuery<TEntity>() where TEntity : DbEntity
+		public string GenerateGetAllQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var columnsList = GenerateColumnsList(_table, info.Columns);
 			return $"SELECT {columnsList} FROM {_table};";
 		}
 
-		public string GenerateGetQuery<TEntity>() where TEntity : DbEntity
+		public string GenerateGetQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var whereClause = info.PrimaryKeys.Count == 0
@@ -59,7 +60,7 @@ DELETE FROM {_table} WHERE {whereClause};";
 			return $"SELECT {columnsList} FROM {_table} WHERE {whereClause};";
 		}
 
-		public string GenerateInsertQuery<TEntity>(TEntity entity) where TEntity : DbEntity
+		public string GenerateInsertQuery(TEntity entity)
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			var identityColumns = info.PrimaryKeys.Where(pk => pk.IsIdentity).ToList();
@@ -82,15 +83,14 @@ DELETE FROM {_table} WHERE {whereClause};";
 			}
 			else
 			{
-				selectStatement = GenerateGetQuery<TEntity>();
+				selectStatement = GenerateGetQuery();
 			}
 			return $@"INSERT INTO {_table} ({string.Join(", ", columnsToInsert.Select(column => column.ColumnName))}) VALUES ({string.Join(", ", columnsToInsert.Select(column => $"@{column.Name}"))});
 {selectStatement}";
 
 		}
 
-		public string GenerateUpdateQuery<TEntity>()
-		where TEntity : DbEntity
+		public string GenerateUpdateQuery()
 		{
 			var info = EntityInformationCache.GetEntityInformation<TEntity>();
 			if (!info.PrimaryKeys.Any())
@@ -106,7 +106,7 @@ DELETE FROM {_table} WHERE {whereClause};";
 			}
 
 			var outputColumns = GenerateColumnsList("inserted", info.Columns);
-			var selectStatement = GenerateGetQuery<TEntity>();
+			var selectStatement = GenerateGetQuery();
 			return $@"UPDATE {_table} SET {setClause} WHERE {GenerateWhereClauseWithPrimaryKeys(info)};
 {selectStatement}";
 		}

@@ -1,4 +1,5 @@
 using System.Data;
+using Ckode.Dapper.Repository.Interfaces;
 using Ckode.Dapper.Repository.Sql;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories

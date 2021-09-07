@@ -33,10 +33,13 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public async Task Delete_UseMissingPrimaryKeyValue_Throws()
+		public async Task Delete_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
-			// Act && Assert
-			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await _repository.DeleteAsync(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
+			// Act
+			var deleted = await _repository.DeleteAsync(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue });
+
+			// Assert
+			Assert.Null(deleted);
 		}
 
 		[Theory, AutoDomainData]
@@ -49,10 +52,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deleted = await _repository.DeleteAsync(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
-			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
-			Assert.Equal(entity.Description, deleted.Description);
-			Assert.Equal(entity.Name, deleted.Name);
-			Assert.Equal(entity.Picture, deleted.Picture);
+			Assert.Equal(insertedEntity.CategoryId, deleted?.CategoryId);
+			Assert.Equal(entity.Description, deleted?.Description);
+			Assert.Equal(entity.Name, deleted?.Name);
+			Assert.Equal(entity.Picture, deleted?.Picture);
 		}
 
 		[Theory, AutoDomainData]
@@ -65,10 +68,10 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var deleted = await _repository.DeleteAsync(insertedEntity);
 
 			// Assert
-			Assert.Equal(insertedEntity.CategoryId, deleted.CategoryId);
-			Assert.Equal(entity.Description, deleted.Description);
-			Assert.Equal(entity.Name, deleted.Name);
-			Assert.Equal(entity.Picture, deleted.Picture);
+			Assert.Equal(insertedEntity.CategoryId, deleted?.CategoryId);
+			Assert.Equal(entity.Description, deleted?.Description);
+			Assert.Equal(entity.Name, deleted?.Name);
+			Assert.Equal(entity.Picture, deleted?.Picture);
 		}
 		#endregion
 
@@ -90,9 +93,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var fetchedEntity = await _repository.GetAsync(new CategoryPrimaryKeyEntity { CategoryId = insertedEntity.CategoryId });
 
 			// Assert
-			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
-			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
-			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
+			Assert.Equal(insertedEntity.Description, fetchedEntity?.Description);
+			Assert.Equal(insertedEntity.Name, fetchedEntity?.Name);
+			Assert.Equal(insertedEntity.Picture, fetchedEntity?.Picture);
 
 			await _repository.DeleteAsync(insertedEntity);
 		}
@@ -107,9 +110,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var fetchedEntity = await _repository.GetAsync(insertedEntity);
 
 			// Assert
-			Assert.Equal(insertedEntity.Description, fetchedEntity.Description);
-			Assert.Equal(insertedEntity.Name, fetchedEntity.Name);
-			Assert.Equal(insertedEntity.Picture, fetchedEntity.Picture);
+			Assert.Equal(insertedEntity.Description, fetchedEntity?.Description);
+			Assert.Equal(insertedEntity.Name, fetchedEntity?.Name);
+			Assert.Equal(insertedEntity.Picture, fetchedEntity?.Picture);
 
 			await _repository.DeleteAsync(insertedEntity);
 		}
@@ -122,10 +125,13 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public async Task Get_UseMissingPrimaryKey_Throws()
+		public async Task Get_UseMissingPrimaryKey_ReturnsNull()
 		{
-			// Act && Assert
-			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await _repository.GetAsync(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue }));
+			// Act
+			var gotten = await _repository.GetAsync(new CategoryPrimaryKeyEntity { CategoryId = int.MaxValue });
+
+			// Assert
+			Assert.Null(gotten);
 		}
 		#endregion
 
@@ -220,7 +226,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			var updatedEntity = await _repository.UpdateAsync(update);
 
 			// Assert
-			Assert.Equal("Something else", updatedEntity.Description);
+			Assert.Equal("Something else", updatedEntity?.Description);
 
 			await _repository.DeleteAsync(insertedEntity);
 		}
@@ -233,7 +239,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 		}
 
 		[Fact]
-		public async Task Update_UseMissingPrimaryKeyValue_Throws()
+		public async Task Update_UseMissingPrimaryKeyValue_ReturnsNull()
 		{
 			// Arrange
 			var entity = new CategoryEntity
@@ -243,8 +249,11 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 				Name = "Hello world"
 			};
 
-			// Act && Assert
-			await Assert.ThrowsAsync<NoEntityFoundException>(async () => await _repository.UpdateAsync(entity));
+			// Act 
+			var updated = await _repository.UpdateAsync(entity);
+
+			// Assert
+			Assert.Null(updated);
 		}
 		#endregion
 	}
