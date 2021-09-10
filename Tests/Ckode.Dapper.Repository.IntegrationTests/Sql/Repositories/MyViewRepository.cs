@@ -9,7 +9,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
 	{
 		protected override IDbConnection CreateConnection()
 		{
-			return ConnectionFactory.CreateConnection();
+			return ConnectionFactory.CreateSqlConnection();
 		}
 
 		protected override IDapperInjection<T> CreateDapperInjection<T>()

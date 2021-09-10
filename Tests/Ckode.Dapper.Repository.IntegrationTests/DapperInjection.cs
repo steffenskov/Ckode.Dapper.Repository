@@ -1,6 +1,6 @@
 using SqlMapper = Dapper.SqlMapper;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
+namespace Ckode.Dapper.Repository.IntegrationTests
 {
 	internal class DapperInjection<TEntity> : IDapperInjection<TEntity>
 	{

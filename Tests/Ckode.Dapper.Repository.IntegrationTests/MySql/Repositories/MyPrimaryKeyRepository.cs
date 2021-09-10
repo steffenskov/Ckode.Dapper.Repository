@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Ckode.Dapper.Repository.Sql;
 
-namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
+namespace Ckode.Dapper.Repository.IntegrationTests.MySql.Repositories
 {
 	public abstract class MyPrimaryKeyRepository<TPrimaryKeyEntity, TEntity> : PrimaryKeyRepository<TPrimaryKeyEntity, TEntity>
 	where TPrimaryKeyEntity : DbEntity
@@ -9,7 +9,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql.Repositories
 	{
 		protected override IDbConnection CreateConnection()
 		{
-			return ConnectionFactory.CreateSqlConnection();
+			return ConnectionFactory.CreateMySqlConnection();
 		}
 
 		protected override IDapperInjection<T> CreateDapperInjection<T>()
