@@ -5,6 +5,6 @@ namespace Ckode.Dapper.Repository.IntegrationTests.MySql.Repositories
 {
 	public class ProductListViewRepository : MyViewRepository<ProductListViewEntity>
 	{
-		protected override string ViewName => "Current Product List";
+		protected override string ViewName => "current_product_list";
 	}
 }

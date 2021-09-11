@@ -1,9 +1,9 @@
 using System;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.MySql.Repositories;
+using MySql.Data.MySqlClient;
 using Xunit;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.MySql
@@ -202,7 +202,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.MySql
 			};
 
 			// Act && Assert
-			await Assert.ThrowsAsync<SqlException>(async () => await _repository.InsertAsync(entity));
+			await Assert.ThrowsAsync<MySqlException>(async () => await _repository.InsertAsync(entity));
 		}
 		#endregion
 

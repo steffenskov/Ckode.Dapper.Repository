@@ -650,5 +650,17 @@ INSERT INTO `suppliers` (`id`, `company`, `last_name`, `first_name`, `email_addr
 INSERT INTO `suppliers` (`id`, `company`, `last_name`, `first_name`, `email_address`, `job_title`, `business_phone`, `home_phone`, `mobile_phone`, `fax_number`, `address`, `city`, `state_province`, `zip_postal_code`, `country_region`, `web_page`, `notes`, `attachments`) VALUES (10, 'Supplier J', 'Sousa', 'Luis', NULL, 'Sales Manager', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '');
 # 10 records
 
+#
+# Dumping data for table 'categories'
+#
+
+INSERT INTO `categories` (`CategoryName`, `Description`) VALUES ('First cat', 'something');
+INSERT INTO `categories` (`CategoryName`, `Description`) VALUES ('sECOND cat', 'something else');
+INSERT INTO `categories` (`CategoryName`, `Description`) VALUES ('Third cat', 'something');
+INSERT INTO `categories` (`CategoryName`, `Description`) VALUES ('Fourth cat', 'something else');
+INSERT INTO `categories` (`CategoryName`, `Description`) VALUES ('Fifth cat', 'something');
+INSERT INTO `categories` (`CategoryName`, `Description`) VALUES ('Sixth cat', 'something else');
+
+
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

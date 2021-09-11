@@ -541,6 +541,43 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
+-- -----------------------------------------------------
+-- Custom tables and views
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `northwind`.`categories` (
+	`CategoryID` INT(11) NOT NULL AUTO_INCREMENT,
+	`CategoryName` varchar (15) NOT NULL ,
+	`Description` LONGTEXT NOT NULL ,
+	`Picture` LONGBLOB NULL ,
+	PRIMARY KEY (`CategoryID`))
+	ENGINE = InnoDB
+	DEFAULT CHARACTER SET = utf8;
+
+
+CREATE TABLE IF NOT EXISTS `northwind`.`composite_users` (
+	`Username` VARCHAR(50) NOT NULL,
+	`Password` VARCHAR(50) NOT NULL,
+	Age INT(11) NULL,
+	DateCreated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`Username`, `Password`))
+	ENGINE = InnoDB
+	DEFAULT CHARACTER SET = utf8;
+
+
+CREATE TABLE IF NOT EXISTS `northwind`.`heaps` (
+	`Username` VARCHAR(50) NOT NULL,
+	`Password` VARCHAR(50) NOT NULL)
+	ENGINE = InnoDB
+	DEFAULT CHARACTER SET = utf8;
+
+
+CREATE VIEW `northwind`.`current_product_list` AS
+SELECT Product_List.id AS ProductID, Product_List.product_name AS ProductName
+FROM products AS Product_List
+WHERE (((Product_List.Discontinued)=0));
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

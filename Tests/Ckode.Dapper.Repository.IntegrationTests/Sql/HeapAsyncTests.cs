@@ -140,7 +140,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.Sql
 			try
 			{
 				// Assert
-				var count = (await _repository.GetAllAsync()).Count();
+				var count = _repository.GetAll()
+										.Where(found => found.Username == entity.Username && found.Password == entity.Password)
+										.Count();
 				Assert.True(count > 1);
 			}
 			finally

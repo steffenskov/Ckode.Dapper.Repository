@@ -118,7 +118,7 @@ namespace Ckode.Dapper.Repository.BaseRepositories
 		public TEntity Insert(TEntity entity)
 		{
 			InvokePreOperation(PreInsert, entity);
-			var result = InsertInternalAsync(entity, (query, input) => Task.FromResult(QuerySingle(query, input)))
+			var result = InsertInternalAsync(entity, (query, input) => Task.FromResult(Query(query, input).First()))
 							.GetAwaiter()
 							.GetResult();
 			InvokePostOperationNotNullable(PostInsert, result);
@@ -128,7 +128,7 @@ namespace Ckode.Dapper.Repository.BaseRepositories
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
 			InvokePreOperation(PreInsert, entity);
-			var result = await InsertInternalAsync(entity, async (query, input) => await QuerySingleAsync(query, input));
+			var result = await InsertInternalAsync(entity, async (query, input) => (await QueryAsync(query, input)).First());
 			InvokePostOperationNotNullable(PostInsert, result);
 			return result;
 		}

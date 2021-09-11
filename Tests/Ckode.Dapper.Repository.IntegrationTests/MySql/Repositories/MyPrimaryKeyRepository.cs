@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using Ckode.Dapper.Repository.Sql;
+using Ckode.Dapper.Repository.MySql;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.MySql.Repositories
 {

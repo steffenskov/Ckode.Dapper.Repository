@@ -1,7 +1,7 @@
-using System.Data.SqlClient;
 using System.Linq;
 using Ckode.Dapper.Repository.IntegrationTests.Entities;
 using Ckode.Dapper.Repository.IntegrationTests.MySql.Repositories;
+using MySql.Data.MySqlClient;
 using Xunit;
 
 namespace Ckode.Dapper.Repository.IntegrationTests.MySql
@@ -117,7 +117,7 @@ namespace Ckode.Dapper.Repository.IntegrationTests.MySql
 			var entity = new UserHeapEntity { Username = "async My name" };
 
 			// Act && Assert
-			Assert.Throws<SqlException>(() => _repository.Insert(entity));
+			Assert.Throws<MySqlException>(() => _repository.Insert(entity));
 		}
 
 		[Theory, AutoDomainData]
@@ -146,7 +146,9 @@ namespace Ckode.Dapper.Repository.IntegrationTests.MySql
 			try
 			{
 				// Assert
-				var count = _repository.GetAll().Count();
+				var count = _repository.GetAll()
+										.Where(found => found.Username == entity.Username && found.Password == entity.Password)
+										.Count();
 				Assert.True(count > 1);
 			}
 			finally

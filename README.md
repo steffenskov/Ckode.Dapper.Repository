@@ -9,20 +9,24 @@ As the project is licensed under MIT you're free to use it for pretty much anyth
 
 You also need to install Dapper yourself, again I'd recommend NuGet: https://www.nuget.org/packages/Dapper/
 
-As for versioning of Dapper, you're actually (somewhat) free to choose whichever you want, as this library isn't built targetting a specific version of Dapper.
+As for versioning of Dapper, you're actually (somewhat) free to choose whichever you want, as this library isn't built targetting a specific version of Dapper. 
+Instead whatever Dapper version you prefer is injected into this extension library. This leaves you free to update Dapper without waiting for a new version of this library.
 
 ## Requirements:
 
 The library requires .Net 5.0 with C# 9 or later, as it's using the "record" type rather than "class" for representing the single entities. (e.g. An "User" from your "Users" table)
 
-Also it currently only supports MS Sql, but feel free to branch it and create support for MySql, PostGre or whatever you're using (as long as Dapper supports it, this library can too)
+Also it currently only supports MS Sql and MySql, but feel free to branch it and create support for PostGre or whatever you're using (as long as Dapper supports it, this library can too)
 
 ## Upcoming features:
 
-- MySql support
 - Repository for aggregates, like e.g. an Order entity with an IList\<OrderLine\> property containing all the orderlines for the order. The idea is you can just call any CRUD method on the repository with an aggregate, and it'll figure out foreign keys etc. for you to ensure everything is inserted/updated/deleted/retrieved in the proper order. Kind of like what Entity Framework does, just better :-P
 - Built-in caching with automatic cache invalidation
 
+## Namespaces:
+
+I've gone with the same class names for both the Ms Sql and MySql base classes, the only difference being their namespace.
+So if you're using Ms Sql use `Ckode.Dapper.Repository.Sql`, and for MySql use `Ckode.Dapper.Repository.MySql`.
 
 ## Usage:
 
