@@ -1,6 +1,13 @@
 # Ckode.Dapper.Repository
 This is an extension library for the Dapper ORM, giving you simple-to-use repositories for all your database access code.
 
+# SOON TO BE DEPRECATED!
+This library will be replaced with this one: https://github.com/steffenskov/Dapper.Repository which features a lot more modern features, such as Dependency Injection, Fluent configuration and ValueObjects.
+
+I'll mark this library as actually deprecated the second the other is finished in a version 1.0 (albeit I might call it 2.0 to ease the differentiation)
+Also this library will not be removed from NuGet, so you can feel free to keep using it if you want - I just wanted to give you a heads-up about the upcoming new version.
+
+
 ## Installation:
 
 I recommend using the NuGet package: https://www.nuget.org/packages/Ckode.Dapper.Repository/ however you can also simply clone the repository and compile the project yourself.
